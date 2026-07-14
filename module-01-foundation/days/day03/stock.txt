@@ -1,0 +1,4 @@
+Paracetamol,20
+Ibuprofen,6
+Vitamin C,25
+Amoxicillin,5

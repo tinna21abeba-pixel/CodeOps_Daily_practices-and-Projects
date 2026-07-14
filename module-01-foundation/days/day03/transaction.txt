@@ -1,0 +1,8 @@
+Hana,250
+Samuel,450
+Almaz,1500
+Dawit,700
+Hana,300
+Samuel,200
+Almaz,500
+Dawit,100
