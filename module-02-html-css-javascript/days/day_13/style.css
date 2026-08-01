@@ -1,0 +1,57 @@
+:root{
+    --brand: rgb(37, 35, 35);
+    --gold:#f4973b;
+    --spacing: 1rem;
+    --font_stack: 'Poppins', sans-serif;
+    
+}
+.btn{
+    background-color: var(--brand);
+    padding: var(--spacing);
+    color: var(--gold);
+    font-family: var(--font_stack);
+
+
+}
+.card{
+    box-sizing:border-box;
+   background-color: beige;
+   width: 300px;
+   padding:24px;
+   border: 2px solid black;
+}
+p{
+    color: var(--gold);
+}
+.highlight {
+  color:rgb(31, 64, 31);
+
+}
+#special{
+    color:rgb(173, 86, 254)
+}
+
+table tr, th,td{
+    border: 2px solid transparent;
+    border-collapse: collapse;
+    margin:10px;
+    padding: 10px;
+}
+tr :nth-child(even){
+    background-color: rgba(25, 25, 25, 0.862);
+    color: white;
+}
+/* Original colors */
+ .color1{ 
+    background: hsl(215, 72%, 14%); 
+    color: white;
+        } 
+ .color2{ background: hsl(42, 69%, 49%); }
+  .color3{ background: hsl(146, 50%, 36%); }
+ /* Hover - lighter by increasing only Lightness */
+
+  .color1:hover{ background: hsl(215, 72%, 24%); }
+   .color2:hover{ background: hsl(42, 69%, 59%); }
+    .color3:hover{ background: hsl(146, 50%, 46%); }
+ 
+   
