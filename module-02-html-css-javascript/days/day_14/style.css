@@ -59,7 +59,7 @@ main{
 .card-container{
     display: flex;
    width: 100%;
-   margin: 5px;
+   margin: 20px;
     gap: 1rem;
     padding: 1rem;
    
@@ -69,10 +69,13 @@ main{
 .card{
 
     flex: 1;
+    padding: 30px;
+    
 }
  .card-container button{
     background-color: rgb(163, 118, 62);
     color: white;
+
     padding: 10px;
 }
 
