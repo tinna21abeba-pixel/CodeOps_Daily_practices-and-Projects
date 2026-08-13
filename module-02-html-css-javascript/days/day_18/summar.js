@@ -20,4 +20,3 @@ const expensiveOrders=ordersWithVat.filter(order=>order.total > 500);
 
  
 console.log(`grant total: ${format(grantTotal)}`);
- 
