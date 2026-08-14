@@ -1,0 +1,213 @@
+/* Universal Resets & Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f4f6f8;
+  color: #2c3e50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+
+.app-container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.app-header {
+  background-color: #006b3f; /* Inspired by Ethiopian flag green */
+  color: #ffffff;
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.app-header p {
+  font-size: 0.875rem;
+  opacity: 0.85;
+}
+
+.item-form {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid #eef2f5;
+  background-color: #fafbfc;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+}
+
+.input-group input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #006b3f;
+}
+
+.btn {
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.primary-btn {
+  background-color: #fcd116; /* Gold accent */
+  color: #1e293b;
+  margin-top: 4px;
+}
+
+.primary-btn:hover {
+  background-color: #e5bd10;
+}
+
+.primary-btn:active {
+  transform: scale(0.99);
+}
+
+
+.list-section {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+.list-header h2 {
+  font-size: 1rem;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.shopping-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.item-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.item-price {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.delete-btn {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover {
+  background-color: #fca5a5;
+}
+
+.item-row.bought {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  opacity: 0.65;
+}
+
+.item-row.bought .item-name {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+
+.empty-state {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  padding: 20px 0;
+}
+
+.summary-footer {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.total-price {
+  font-size: 1.25rem;
+  color: #fcd116;
+}
