@@ -47,7 +47,9 @@ form.addEventListener('submit', (event) => {
 
   
   if (!name || isNaN(price) || price < 80) {
-    alert ("the price should be more than 80"); // silently bail — required attr + min="0" already help in the HTML
+    alert ("the price should be more than 80"); 
+    return;
+    // silently bail — required attr + min="0" already help in the HTML
   }
 
   const newItem = { id: nextId++, name, price, bought: false };
