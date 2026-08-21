@@ -34,7 +34,8 @@ body {
     transition: all 0.3s ease;
     height: 90px;
     width: 100%;
-
+    background: #1a1b23;
+    z-index: 1000;
 }
 
 .logo span {
@@ -107,6 +108,40 @@ body {
 
 
 
+}
+#role-text {
+    display: inline-flex;
+}
+
+.rain-letter {
+    display: inline-block;
+    opacity: 0;
+
+    transform: translateY(-300px);
+
+    animation: rainDrop 1s cubic-bezier(.2, .8, .3, 1) forwards;
+    animation-delay: var(--delay);
+}
+
+@keyframes rainDrop {
+    0% {
+        opacity: 0;
+        transform: translateY(-300px);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(20px);
+    }
+
+    85% {
+        transform: translateY(-5px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero-content {
@@ -323,7 +358,7 @@ span {
         padding: 15px 20px;
         height: auto;
         width: 100%;
-        background:transparent;
+        background: #1a1b23;
         position: fixed;
         top: 0;
         left: 0;
