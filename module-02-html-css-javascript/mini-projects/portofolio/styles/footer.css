@@ -1,7 +1,8 @@
 /* ================= FOOTER & CONTACT SECTION ================= */
 .footer-section {
     padding: 100px 50px 30px;
-    background-color: #0b0c10; /* slightly darker background */
+    background-color: #0b0c10;
+    /* slightly darker background */
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -124,7 +125,8 @@
 }
 
 .contact-item i {
-    color: #c000ff; /* accent color */
+    color: #c000ff;
+    /* accent color */
 }
 
 .contact-item a {
@@ -157,6 +159,7 @@
     .footer-grid {
         grid-template-columns: 1fr 1fr;
     }
+
     .follow-col {
         grid-column: span 2;
     }
@@ -166,13 +169,16 @@
     .footer-section {
         padding: 60px 20px 20px;
     }
+
     .footer-grid {
         grid-template-columns: 1fr;
         gap: 40px;
     }
+
     .follow-col {
         grid-column: span 1;
     }
+
     .footer-bottom {
         flex-direction: column;
         gap: 15px;

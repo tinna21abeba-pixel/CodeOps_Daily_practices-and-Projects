@@ -226,346 +226,192 @@ nav ul li a {
    font-size: large;
 
   }
-  @media (max-width:768px){
-
-.app{
-
-grid-template-columns:1fr;
-
-grid-template-areas:
-
-"header"
-"main"
-"sidebar"
-"footer";
-
-}
-
-.sidebar{
-display:none;
-}
-
-header{
-
-flex-direction:column;
-height:auto;
-
-}
-
-nav ul{
-
-flex-direction:column;
-margin-left:0;
-gap:10px;
-
-}
-
-.lists ul{
-
-flex-direction:column;
-margin:10px 0;
-
-}
-
-.hero{
-
-height:auto;
-
-}
-
-.banner-content{
-
-padding:20px;
-
-}
-
-.btn{
-
-position:static;
-margin-top:20px;
-
-}
-
-}
 /* ==========================
    RESPONSIVE DESIGN
    ========================== */
 
-
 /* Tablets */
-@media (max-width: 1024px){
-
-    header{
+@media (max-width: 1024px) {
+    header {
         flex-wrap: wrap;
         height: auto;
         padding: 15px;
     }
 
-
-    nav ul{
+    nav ul {
         margin-left: 0;
         gap: 15px;
         flex-wrap: wrap;
         justify-content: center;
     }
 
-
-    .subheader{
+    .subheader {
         height: auto;
         flex-wrap: wrap;
         padding: 15px;
+        position: relative;
     }
 
-
-    .logo{
+    .logo {
         justify-content: center;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .lists ul {
+        margin-left: 0;
+        margin-top: 15px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .lists select {
+        width: 130px;
+    }
+
+    .hero {
+        width: 95%;
+        height: 400px;
+        margin: auto;
+        margin-bottom: 20px;
+        background-position: center;
+    }
+
+    .banner-content {
+        max-width: 500px;
+        padding: 20px;
+    }
+
+    .btn {
+        top: 320px;
+    }
+}
+
+/* Mobile Devices */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        height: auto;
+        padding: 20px;
+    }
+
+    nav {
         width: 100%;
     }
 
-
-    .lists ul{
-        margin-left:0;
-        margin-top:15px;
-        flex-wrap:wrap;
-        justify-content:center;
-        gap:10px;
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        gap: 15px;
     }
 
-
-    .lists select{
-        width:130px;
+    nav ul li {
+        text-align: center;
     }
 
-
-    .hero{
-        width:95%;
-        height:400px;
-        margin:auto;
+    .theme {
+        margin-top: 15px;
+        text-align: center;
     }
 
-
-    .banner-content{
-        max-width:500px;
+    .subheader {
+        flex-direction: column;
+        height: auto;
+        position: relative;
     }
 
+    .logo {
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+    }
 
+    .subheader_content {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .lists {
+        width: 100%;
+    }
+
+    .lists ul {
+        flex-direction: column;
+        margin: 20px 0;
+        padding: 0;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .lists select {
+        width: 220px;
+        text-align: center;
+    }
+
+    .hero {
+        height: 450px;
+        width: 100%;
+        background-position: center;
+    }
+
+    .banner-content {
+        padding: 20px;
+        justify-content: center;
+    }
+
+    .banner-title {
+        font-size: 20px;
+        letter-spacing: 2px;
+        margin: 10px;
+    }
+
+    .banner-subtitle h2 {
+        font-size: 18px;
+    }
+
+    .banner-description {
+        margin-left: 10px;
+    }
+
+    .btn {
+        position: static;
+        margin: 20px auto 0 auto;
+        display: block;
+    }
 }
-
-
-
-/* Mobile Devices */
-@media (max-width:768px){
-
-
-    header{
-
-        flex-direction:column;
-        height:auto;
-        padding:20px;
-    }
-
-
-    nav{
-        width:100%;
-    }
-
-
-    nav ul{
-
-        flex-direction:column;
-        width:100%;
-        margin:0;
-        padding:0;
-        gap:15px;
-    }
-
-
-    nav ul li{
-
-        text-align:center;
-    }
-
-
-
-    .theme{
-
-        margin-top:10px;
-
-    }
-
-
-
-    .subheader{
-
-        flex-direction:column;
-        height:auto;
-        position:sticky;
-        top:0;
-
-    }
-
-
-    .logo{
-
-        flex-direction:column;
-        align-items:center;
-        height:auto;
-
-    }
-
-
-    .subheader_content{
-
-        text-align:center;
-
-    }
-
-
-
-    .lists{
-
-        width:100%;
-
-    }
-
-
-
-    .lists ul{
-
-        flex-direction:column;
-        margin:20px 0;
-        padding:0;
-        gap:15px;
-        align-items:center;
-
-    }
-
-
-
-    .lists select{
-
-        width:220px;
-        text-align:center;
-
-    }
-
-
-
-    .hero{
-
-        height:450px;
-        width:100%;
-        background-position:center;
-
-    }
-
-
-
-    .banner-content{
-
-        padding:20px;
-        justify-content:center;
-
-    }
-
-
-
-    .banner-title{
-
-        font-size:20px;
-        letter-spacing:2px;
-        margin:10px;
-
-    }
-
-
-
-    .banner-subtitle h2{
-
-        font-size:18px;
-
-    }
-
-
-
-    .banner-description{
-
-        margin-left:10px;
-
-    }
-
-
-
-    .btn{
-
-        position:static;
-        margin:20px 0 0 30px;
-
-    }
-
-
-}
-
-
 
 /* Small phones */
-@media (max-width:480px){
-
-
-    header{
-
-        padding:10px;
-
+@media (max-width: 480px) {
+    header {
+        padding: 10px;
     }
 
-
-    input{
-
-        width:120px;
-
+    input {
+        width: 120px;
     }
 
-
-    .hero{
-
-        height:400px;
-
+    .hero {
+        height: 400px;
     }
 
-
-    .banner-title h1{
-
-        font-size:22px;
-
+    .banner-title h1 {
+        font-size: 22px;
     }
 
-
-    .banner-subtitle h2{
-
-        font-size:15px;
-
+    .banner-subtitle h2 {
+        font-size: 15px;
     }
 
-
-    .banner-description{
-
-        font-size:14px;
-
+    .banner-description {
+        font-size: 14px;
     }
 
-
-    .btn{
-
-        width:120px;
-        font-size:14px;
+    .btn {
+        width: 120px;
+        font-size: 14px;
         box-shadow: 0 0 10px gray;
-
     }
-
-
 }
-
-
-  
-
-  
