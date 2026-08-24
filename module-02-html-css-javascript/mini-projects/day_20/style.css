@@ -111,3 +111,12 @@ body {
 .fact-value {
   font-weight: 500;
 }
+body.dark {
+    background: #222;
+    color: white;
+}
+
+body.dark .card {
+    background: #333;
+    color: white;
+}

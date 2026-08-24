@@ -30,7 +30,36 @@
 
     </section>
   </main>
+  <section class="signup-section">
+  <h2>Signup</h2>
 
-  <script src="app.js"></script>
+  <form id="signup-form">
+    <div>
+      <label for="name-input">Name</label>
+      <input
+        type="text"
+        id="name-input"
+        placeholder="Enter your name"
+      >
+    </div>
+
+    <div>
+      <label for="phone-input">Phone</label>
+      <input
+        type="tel"
+        id="phone-input"
+        placeholder="Enter your Ethiopian phone number"
+      >
+    </div>
+
+    <button type="submit">Sign Up</button>
+
+    <p id="signup-error" aria-live="polite"></p>
+  </form>
+
+  <p id="signup-count"></p>
+</section>
+
+  <script src="index.js"></script>
 </body>
 </html>
