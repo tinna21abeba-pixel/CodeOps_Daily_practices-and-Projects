@@ -1,4 +1,4 @@
-/* ================= SKILLS SECTION ================= */
+
 .skills-section {
     padding: 100px 50px;
     background-color: transparent;
@@ -68,12 +68,12 @@
 .progress-bar-fill {
     height: 100%;
     background-color: #6366f1;
-    /* Matching the purple theme */
+    
     border-radius: 10px;
     transition: width 1s ease-in-out;
 }
 
-/* Icon Colors for specific technologies */
+
 .text-orange {
     color: #f16529;
 }
@@ -102,7 +102,7 @@
     color: #ef4444;
 }
 
-/* RESPONSIVE */
+
 @media(max-width: 992px) {
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);

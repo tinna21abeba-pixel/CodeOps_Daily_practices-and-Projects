@@ -1,8 +1,8 @@
-/* ================= FOOTER & CONTACT SECTION ================= */
+
 .footer-section {
     padding: 100px 50px 30px;
     background-color: #0b0c10;
-    /* slightly darker background */
+    
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -18,7 +18,7 @@
     margin-bottom: 60px;
 }
 
-/* Column 1 */
+
 .footer-heading {
     color: #ffffff;
     font-size: 24px;
@@ -34,7 +34,7 @@
     margin-bottom: 30px;
 }
 
-/* Column 2: Testimonial */
+
 .testimonial-card {
     background-color: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -85,7 +85,7 @@
     font-size: 12px;
 }
 
-/* Column 3: Follow Me */
+
 .social-links {
     display: flex;
     gap: 15px;
@@ -126,7 +126,7 @@
 
 .contact-item i {
     color: #c000ff;
-    /* accent color */
+    
 }
 
 .contact-item a {
@@ -139,7 +139,7 @@
     color: #ffffff;
 }
 
-/* Bottom Bar */
+
 .footer-bottom {
     display: flex;
     justify-content: space-between;
@@ -154,7 +154,46 @@
     color: #ef4444;
 }
 
-/* RESPONSIVE */
+/* Contact Form Styles */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--textcolor);
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--spanscolor);
+    box-shadow: 0 0 10px rgba(192, 0, 255, 0.2);
+}
+
+.form-submit-btn {
+    width: 100%;
+    margin-top: 5px;
+}
+
+.form-status {
+    font-size: 14px;
+    min-height: 20px;
+}
+.form-status.success {
+    color: #10b981;
+}
+.form-status.error {
+    color: #ef4444;
+}
 @media(max-width: 992px) {
     .footer-grid {
         grid-template-columns: 1fr 1fr;
