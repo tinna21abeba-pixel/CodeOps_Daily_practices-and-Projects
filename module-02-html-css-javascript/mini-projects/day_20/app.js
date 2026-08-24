@@ -2,6 +2,7 @@ const myform = document.querySelector("#search-form");
 const myInput = document.querySelector("#country-input");
 const btn = document.querySelector("#btn");
 const facts = document.querySelector("#facts");
+const themeToggle=document.querySelector("#theme-toggle")
 
 
 function renderStat(label, value){
@@ -66,3 +67,5 @@ myform.addEventListener("submit", (e)=>{
         myInput.value="";
     }
 })
+
+

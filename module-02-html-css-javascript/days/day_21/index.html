@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Country Facts Explorer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <header class="card-header">
+      <h1>Country Facts</h1>
+      <p>Explore quick statistics using real-time API data.</p>
+    </header>
+     <button id="theme-toggle" type="button">Dark Mode</button>
+
+    <form id="search-form" class="search-box">
+      <input 
+        type="text" 
+        id="country-input" 
+        placeholder="Enter country name (e.g., Ethiopia)"
+        value="Ethiopia"
+        required
+      >
+      <button type="submit" id="btn">Search</button>
+    </form>
+
+   
+    <section id="facts" class="facts-container" aria-live="polite">
+
+    </section>
+  </main>
+  <section class="signup-section">
+  <h2>Signup</h2>
+
+  <form id="signup-form">
+    <div>
+      <label for="name-input">Name</label>
+      <input
+        type="text"
+        id="name-input"
+        placeholder="Enter your name"
+      >
+    </div>
+
+    <div>
+      <label for="phone-input">Phone</label>
+      <input
+        type="tel"
+        id="phone-input"
+        placeholder="Enter your Ethiopian phone number"
+      >
+    </div>
+
+    <button type="submit">Sign Up</button>
+
+    <p id="signup-error" aria-live="polite"></p>
+  </form>
+
+  <p id="signup-count"></p>
+</section>
+
+  <script src="index.js"></script>
+</body>
+</html>
