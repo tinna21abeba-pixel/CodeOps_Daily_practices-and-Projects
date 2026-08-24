@@ -1,4 +1,4 @@
-/* ================= BLOGS SECTION ================= */
+
 .blogs-section {
     padding: 100px 50px;
     background-color: transparent;
@@ -113,7 +113,7 @@
     transform: translateX(5px);
 }
 
-/* RESPONSIVE */
+
 @media(max-width: 992px) {
     .blogs-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -131,3 +131,4 @@
         grid-template-columns: 1fr;
     }
 }
+
