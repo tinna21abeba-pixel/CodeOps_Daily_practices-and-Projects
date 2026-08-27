@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import Card from './components/Card'
+
+import Main from './components/Main'
+import Header from './components/Header'
 
 
 
@@ -8,7 +10,8 @@ function App() {
 
   return (
     <>
-<Card/>
+    <Header/>
+<Main/>
     </>
   )
 }
