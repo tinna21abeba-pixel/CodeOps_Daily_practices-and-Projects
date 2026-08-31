@@ -45,6 +45,14 @@ const spentPercentage =
     document.querySelector("#spentPercentage");
 
 
+const categoryButtons =
+    document.querySelectorAll(".category-btn");
+const categoryInput =
+    document.querySelector("#category");
+const budgetCategories =
+    document.querySelectorAll(".budget-category");
+
+
 function renderTransactions(){
     transactionList.innerHTML = "";
     transactions.forEach(transaction=>{
@@ -98,9 +106,84 @@ function renderTransactions(){
   }
   
  }
-  transactionForm.addEventListener("submit", (e)=>{
-   e.preventDefault();
-   
-  })
+ 
+
+ transactionForm.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+
+    const amount =
+        Number(document.querySelector("#amount").value);
+
+    const type =
+        document.querySelector("#type").value;
+
+    const category =
+        document.querySelector("#category").value;
+
+    const date =
+        document.querySelector("#date").value;
+
+    const notes =
+        document.querySelector("#notes").value;
+
+
+    const newTransaction = {
+
+        id: Date.now(),
+
+        title: category,
+
+        amount: amount,
+
+        type: type,
+
+        category: category,
+
+        date: date,
+
+        notes: notes
+    };
+
+
+    transactions.push(newTransaction);
+
+
+    renderTransactions();
+
+   updateDashBoard();
+
+
+    transactionForm.reset();
+
+});
+
+categoryButtons.forEach(button => {
+
+    button.addEventListener("click", function() {
+
+       categoryButtons.forEach(btn=>{
+        btn.classList.remove("active");
+       })
+       button.classList.add("active");
+
+
+        const selectedCategory =
+            button.dataset.category;
+
+        categoryInput.value =
+            selectedCategory;
+
+    });
+
+});
+
+function categorySpent(category){
+    const  spent=transactions.filter((transaction)=>transaction.category===category && transaction.type==="expense")
+                                   .reduce((total, transaction)=>total +transaction.amount, 0)
+     return spent;
+}
+
 renderTransactions();
 updateDashBoard();
