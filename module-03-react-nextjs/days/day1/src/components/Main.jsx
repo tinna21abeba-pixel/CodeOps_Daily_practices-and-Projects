@@ -33,6 +33,11 @@ function Main() {
       ? menu
       : menu.filter((dish) => dish.catagory === selectedCategory);
 
+  // 1. Set document.title to the number of dishes currently shown, updating whenever the list changes
+  React.useEffect(() => {
+    document.title = `${filteredMenu.length} Dishes - Taste of Habesha`;
+  }, [filteredMenu.length]);
+
   return (
     <>
       <main className="menu-container">
