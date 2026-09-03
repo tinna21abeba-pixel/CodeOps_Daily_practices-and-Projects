@@ -1,7 +1,14 @@
 import React from 'react'
+import { useTheme } from '../context/ThemeContext'
 
 function Card({ children }) {
-  return <div className="card">{children}</div>
+  const { theme } = useTheme();
+
+  return (
+    <div className={`card ${theme === 'dark' ? 'card-dark' : 'card-light'}`}>
+      {children}
+    </div>
+  )
 }
 
-export default Card
+export default Card
