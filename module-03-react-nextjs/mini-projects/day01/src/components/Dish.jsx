@@ -1,34 +1,47 @@
-import React, { useState } from 'react'
-import Card from './Card'
-import propTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
+import Card from './Card';
+import { useCart } from '../context/CartProvider';
 
-function Dish({ name, price, catagory, currency = "ETB", isSpicy, onAdd, onItem }) {
-  const [count, setCount] = useState(0);
-  function addCount() {
-    setCount(count + 1);
+function Dish({ dish }) {
+  const { dispatch } = useCart();
+
+  function handleAddToCart() {
+    dispatch({ type: 'add', dish });
   }
 
   return (
     <div className="cards">
       <Card>
-        <h3>{name}-{count}</h3>
-        <p className="price">{price} {currency}</p>
-        <p className="category">{catagory}</p>
-        <p>{isSpicy && 'Spicy'}</p>
-        <button onClick={() => { onAdd(price); onItem(); addCount(); }}>Add</button>
+        <div className="dish-card-header">
+          <h3>{dish.name}</h3>
+          {dish.isSpicy && <span className="spicy-badge">🌶️ Spicy</span>}
+        </div>
+        <p className="category">{dish.catagory}</p>
+        <div className="dish-card-footer">
+          <p className="price">{dish.price} ETB</p>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={handleAddToCart}
+            aria-label={`Add ${dish.name} to cart`}
+          >
+            + Add to Cart
+          </button>
+        </div>
       </Card>
     </div>
-  )
+  );
 }
 
 Dish.propTypes = {
-  name: propTypes.string.isRequired,
-  price: propTypes.number.isRequired,
-  catagory: propTypes.string.isRequired,
-  currency: propTypes.string,
-  isSpicy: propTypes.bool,
-  onAdd: propTypes.func,
-  onItem: propTypes.func,
-}
+  dish: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    catagory: PropTypes.string.isRequired,
+    isSpicy: PropTypes.bool,
+  }).isRequired,
+};
 
-export default Dish
+export default Dish;
