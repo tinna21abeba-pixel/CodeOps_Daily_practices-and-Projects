@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { useCart } from '../context/CartProvider';
+import { useCartStore } from '../cartStore';
 
 function CheckoutPanel() {
-  const { items, dispatch, total } = useCart();
+  const items = useCartStore((state) => state.items);
+  const remove = useCartStore((state) => state.remove);
+  const clear = useCartStore((state) => state.clear);
+  const total = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.price, 0)
+  );
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -25,7 +31,7 @@ function CheckoutPanel() {
     if (!canSubmit) return;
 
     setOrderPlaced(true);
-    dispatch({ type: 'clear' });
+    clear();
   }
 
   function handleResetOrder() {
@@ -64,7 +70,7 @@ function CheckoutPanel() {
                 <button
                   type="button"
                   className="clear-cart-btn"
-                  onClick={() => dispatch({ type: 'clear' })}
+                  onClick={clear}
                   title="Remove all items from cart"
                 >
                   Clear Cart
@@ -87,7 +93,7 @@ function CheckoutPanel() {
                     <button
                       type="button"
                       className="remove-item-btn"
-                      onClick={() => dispatch({ type: 'remove', id: item.id })}
+                      onClick={() => remove(item.id)}
                       title={`Remove ${item.name}`}
                     >
                       ✕

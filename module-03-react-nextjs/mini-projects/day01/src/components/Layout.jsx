@@ -1,17 +1,15 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import Header from './Header';
+import { useAuth } from '../context/AuthProvider';
+import { useTheme } from '../context/ThemeProvider';
 
-/**
- * Layout Component
- * Serves as the top-level parent route frame containing Header, navigation bar,
- * child route outlet, and page footer.
- */
 function Layout() {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const { isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout theme-${theme}`}>
       <Header />
       <nav className="main-nav" aria-label="Main Navigation">
         <NavLink
@@ -43,8 +41,17 @@ function Layout() {
           to="/login"
           className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
         >
-          {isLoggedIn ? 'Account (Signed In)' : 'Login'}
+          {isAuthenticated ? 'Account (Signed In)' : 'Login'}
         </NavLink>
+        <button
+          type="button"
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          title="Toggle Theme"
+          style={{ marginLeft: 'auto', background: 'transparent', border: '1px solid currentColor', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer' }}
+        >
+          {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+        </button>
       </nav>
 
       <main className="main-content-outlet">
