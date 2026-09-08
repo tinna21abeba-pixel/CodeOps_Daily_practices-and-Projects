@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Dish from "./Dish";
 import CategoryBar from "./CategoryBar";
 import OrderForm from "./OrderForm";
+import { useCartStore } from "../store/useCartStore";
 
 const categories = ["All", "main", "side"];
 
@@ -10,10 +11,14 @@ function Main() {
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
 
-  // 2 & 3. Fetch dishes in useEffect with empty dependency array, loading & error state
+  const totalItems = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + (item.quantity || 1), 0)
+  );
+  const totalPrice = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
+  );
+
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -25,24 +30,15 @@ function Main() {
       .finally(() => setLoading(false));
   }, []);
 
-  function handleAdd(price) {
-    setTotalPrice((prevTotal) => prevTotal + price);
-  }
-  function handleTotalItems() {
-    setTotalItems((prev) => prev + 1);
-  }
-
   const filteredMenu =
     selectedCategory === "All"
       ? dishes
       : dishes.filter((dish) => dish.catagory === selectedCategory);
 
-  // 1. Set document.title to the number of dishes currently shown, updating whenever the list changes
   useEffect(() => {
     document.title = `${filteredMenu.length} Dishes - Taste of Habesha`;
   }, [filteredMenu.length]);
 
-  // 3. Render loading and error states with early returns before the list
   function renderList() {
     if (loading) {
       return (
@@ -66,12 +62,11 @@ function Main() {
         {filteredMenu.map((dish) => (
           <Dish
             key={dish.id}
+            id={dish.id}
             name={dish.name}
             price={dish.price}
             catagory={dish.catagory}
             isSpicy={dish.isSpicy}
-            onAdd={handleAdd}
-            onItem={handleTotalItems}
           />
         ))}
       </div>
