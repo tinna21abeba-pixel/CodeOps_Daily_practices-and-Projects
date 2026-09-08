@@ -1,17 +1,12 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
-import { useCart } from '../context/CartProvider';
+import { useCartStore } from '../cartStore';
 
-/**
- * DishDetail Component
- * Reads the dynamic `id` route parameter via useParams()
- * Displays dish information and allows adding directly to cart.
- */
 function DishDetail() {
   const { id } = useParams();
   const { data: dishes, loading, error } = useFetch('/dishes.json');
-  const { dispatch } = useCart();
+  const addItem = useCartStore((state) => state.addItem);
 
   if (loading) {
     return (
@@ -50,7 +45,7 @@ function DishDetail() {
   }
 
   function handleAddToCart() {
-    dispatch({ type: 'add', dish });
+    addItem(dish);
   }
 
   return (

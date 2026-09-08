@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Card from './Card';
-import { useCart } from '../context/CartProvider';
+import { useCartStore } from '../cartStore';
 
 function Dish({ dish }) {
-  const { dispatch } = useCart();
+  const addItem = useCartStore((state) => state.addItem);
 
   function handleAddToCart() {
-    dispatch({ type: 'add', dish });
+    addItem(dish);
   }
 
   return (

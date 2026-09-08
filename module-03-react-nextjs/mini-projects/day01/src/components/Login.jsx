@@ -1,33 +1,30 @@
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthProvider';
 
-/**
- * Login Component
- * Handles authentication status, remembering the user's intended destination.
- */
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const { isAuthenticated, login, logout, user } = useAuth();
   const destination = location.state?.from?.pathname || '/checkout';
 
   function handleLogin() {
-    localStorage.setItem('isLoggedIn', 'true');
+    login({ name: 'Abebe Bikila' });
     navigate(destination, { replace: true });
   }
 
   function handleLogout() {
-    localStorage.removeItem('isLoggedIn');
+    logout();
     navigate('/login', { replace: true });
   }
 
   return (
     <div className="login-card">
       <h2>Account Login</h2>
-      {isLoggedIn ? (
+      {isAuthenticated ? (
         <div className="auth-card-body">
           <p className="auth-status-success">
-            ✅ You are currently signed in.
+            ✅ You are currently signed in{user?.name ? ` as ${user.name}` : ''}.
           </p>
           <div className="login-actions">
             <Link to="/checkout" className="submit-order-btn action-link">

@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartProvider';
+import { useCartStore } from '../cartStore';
 
-/**
- * Cart Component
- * Displays items added to the cart, calculates total, and links to checkout.
- */
 function Cart() {
-  const { items, dispatch, total } = useCart();
+  const items = useCartStore((state) => state.items);
+  const remove = useCartStore((state) => state.remove);
+  const clear = useCartStore((state) => state.clear);
+  const total = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.price, 0)
+  );
 
   return (
     <div className="cart-page">
@@ -29,7 +30,7 @@ function Cart() {
             <button
               type="button"
               className="clear-cart-btn"
-              onClick={() => dispatch({ type: 'clear' })}
+              onClick={clear}
             >
               Clear All Items
             </button>
@@ -49,7 +50,7 @@ function Cart() {
                   <button
                     type="button"
                     className="remove-item-btn"
-                    onClick={() => dispatch({ type: 'remove', id: item.id })}
+                    onClick={() => remove(item.id)}
                     title={`Remove ${item.name}`}
                   >
                     ✕

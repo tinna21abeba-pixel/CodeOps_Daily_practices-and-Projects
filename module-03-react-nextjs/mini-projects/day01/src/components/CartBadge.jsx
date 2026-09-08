@@ -1,21 +1,19 @@
 import React from 'react';
-import { useCart } from '../context/CartProvider';
+import { useCartStore } from '../cartStore';
 
-/**
- * CartBadge Component
- * Reads items and total directly from CartContext via useCart()
- * Demonstrates zero prop drilling across the component tree.
- */
 function CartBadge() {
-  const { items, total } = useCart();
+  const itemCount = useCartStore((state) => state.items.length);
+  const total = useCartStore((state) =>
+    state.items.reduce((sum, item) => sum + item.price, 0)
+  );
 
   return (
     <div className="cart-badge-container">
       <div className="cart-badge-icon" aria-label="Cart items count">
         <span className="cart-icon">🛒</span>
-        {items.length > 0 && (
+        {itemCount > 0 && (
           <span className="badge-count" data-testid="cart-badge-count">
-            {items.length}
+            {itemCount}
           </span>
         )}
       </div>
