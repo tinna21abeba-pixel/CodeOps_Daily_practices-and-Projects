@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import Card from './Card';
 import { useCart } from '../context/CartProvider';
 
@@ -17,17 +18,22 @@ function Dish({ dish }) {
           <h3>{dish.name}</h3>
           {dish.isSpicy && <span className="spicy-badge">🌶️ Spicy</span>}
         </div>
-        <p className="category">{dish.catagory}</p>
+        <p className="category">{dish.catagory || dish.category}</p>
         <div className="dish-card-footer">
           <p className="price">{dish.price} ETB</p>
-          <button
-            type="button"
-            className="add-btn"
-            onClick={handleAddToCart}
-            aria-label={`Add ${dish.name} to cart`}
-          >
-            + Add to Cart
-          </button>
+          <div className="dish-card-actions">
+            <Link to={`/menu/${dish.id}`} className="view-detail-link">
+              Details
+            </Link>
+            <button
+              type="button"
+              className="add-btn"
+              onClick={handleAddToCart}
+              aria-label={`Add ${dish.name} to cart`}
+            >
+              + Add
+            </button>
+          </div>
         </div>
       </Card>
     </div>
@@ -39,7 +45,8 @@ Dish.propTypes = {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
-    catagory: PropTypes.string.isRequired,
+    catagory: PropTypes.string,
+    category: PropTypes.string,
     isSpicy: PropTypes.bool,
   }).isRequired,
 };
