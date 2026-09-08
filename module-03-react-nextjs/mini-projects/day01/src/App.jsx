@@ -1,23 +1,39 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartProvider';
-import Header from './components/Header';
+import Layout from './components/Layout';
+import Home from './components/Home';
 import Menu from './components/Menu';
-import CheckoutPanel from './components/CheckoutPanel';
+import DishDetail from './components/DishDetail';
+import Cart from './components/Cart';
+import Checkout from './components/Checkout';
+import RequireAuth from './components/RequireAuth';
+import Login from './components/Login';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
     <CartProvider>
-      <div className="app-layout">
-        <Header />
-        <main className="content-container">
-          <section className="menu-container-section">
-            <Menu />
-          </section>
-          <aside className="checkout-sidebar-section">
-            <CheckoutPanel />
-          </aside>
-        </main>
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="menu" element={<Menu />} />
+            <Route path="menu/:id" element={<DishDetail />} />
+            <Route path="cart" element={<Cart />} />
+            <Route
+              path="checkout"
+              element={
+                <RequireAuth>
+                  <Checkout />
+                </RequireAuth>
+              }
+            />
+            <Route path="login" element={<Login />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </CartProvider>
   );
 }
