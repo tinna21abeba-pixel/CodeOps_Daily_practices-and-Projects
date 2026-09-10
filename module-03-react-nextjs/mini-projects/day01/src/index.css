@@ -879,11 +879,405 @@ body {
 }
 
 /* ========================================================= */
-/* Checkout Screen (/checkout)                               */
+/* Checkout Screen (/checkout) & Field Form Controls         */
 /* ========================================================= */
 .checkout-page-wrapper {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
+}
+
+.checkout-screen-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkout-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 32px 28px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.checkout-card-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+}
+
+.checkout-card-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.checkout-card-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Simulation Toolbar */
+.simulation-toolbar {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px dashed var(--accent-amber);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+}
+
+.simulation-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--text-main);
+}
+
+.simulation-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-amber);
+  cursor: pointer;
+}
+
+/* Global Alert / Failure Announcement Banner */
+.checkout-error-banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 2px solid var(--accent-red);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  color: #fca5a5;
+  outline: none;
+}
+
+.checkout-error-banner:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
+}
+
+.checkout-error-banner .banner-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.checkout-error-banner .banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkout-error-banner .banner-content strong {
+  color: #fee2e2;
+  font-size: 1.05rem;
+}
+
+.checkout-error-banner .banner-content p {
+  color: #fca5a5;
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.checkout-error-banner .banner-content small {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+/* Order Items Preview in Checkout */
+.order-items-preview {
+  background-color: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.preview-total-badge {
+  background-color: var(--accent-amber);
+  color: #1e1e1e;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.preview-items-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.preview-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(51, 65, 85, 0.6);
+}
+
+.preview-item-row:last-child {
+  border-bottom: none;
+}
+
+.preview-item-row .item-name {
+  color: var(--text-main);
+}
+
+.empty-cart-notice {
+  padding: 12px 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+/* Form Styles */
+.addis-eats-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Form Field Groups (Field.jsx) */
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.field-label-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.field-label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-required-marker {
+  color: var(--accent-amber);
+  font-weight: 700;
+}
+
+.field-helper-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.field-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Base input control */
+.field-control {
+  width: 100%;
+  background-color: #0f172a;
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: var(--text-main);
+  font-size: 0.98rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-control:focus-visible {
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+.field-control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #172033;
+}
+
+/* Greyscale-friendly and accessible error states */
+.field-control.is-invalid,
+.form-field-group.has-error .field-control {
+  border: 2px solid var(--accent-red);
+  background-color: rgba(239, 68, 68, 0.05);
+  box-shadow: 0 0 0 1px var(--accent-red);
+  outline: 1px dashed rgba(239, 68, 68, 0.5);
+  outline-offset: 1px;
+}
+
+.field-control.is-invalid:focus-visible,
+.form-field-group.has-error .field-control:focus-visible {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+}
+
+.field-error-icon {
+  position: absolute;
+  right: 12px;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+/* Error message live region */
+.field-error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.86rem;
+  color: #fca5a5;
+  font-weight: 600;
+  margin-top: 2px;
+  padding: 4px 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid var(--accent-red);
+  border-radius: 0 6px 6px 0;
+}
+
+.field-error-message .error-icon-prefix {
+  font-size: 0.95rem;
+}
+
+/* Submit section */
+.form-submit-section {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-btn-primary.full-width {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.action-btn-primary.is-loading {
+  opacity: 0.8;
+  cursor: wait;
+  position: relative;
+}
+
+.keyboard-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.keyboard-hint kbd {
+  background: #1e293b;
+  border: 1px solid var(--border-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: var(--accent-amber-light);
+}
+
+/* Success View (State 4) */
+.checkout-success-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.success-icon-badge {
+  font-size: 3.5rem;
+  animation: bounceSuccess 0.6s ease;
+}
+
+@keyframes bounceSuccess {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #6ee7b7;
+}
+
+.success-reference {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.success-summary-card {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.success-summary-card h4 {
+  font-size: 1rem;
+  color: var(--accent-amber);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.summary-row strong {
+  color: var(--text-main);
+}
+
+.summary-row.total-highlight {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 10px;
+  margin-top: 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.total-highlight-val {
+  color: var(--accent-amber-light);
+  font-size: 1.2rem;
+  font-weight: 800;
 }
 
 /* ========================================================= */
