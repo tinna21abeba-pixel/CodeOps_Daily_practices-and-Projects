@@ -1,76 +1,88 @@
-# Addis Eats - The Cart, Moved to a Store
+# Mini-Project · The Addis Eats Checkout
 
-A multi-screen food ordering web application with state management split between a persistent **Zustand store** (for cart operations) and **React Context with guarded hooks** (for authentication and theme).
+> **Module 3 · Day 33** — IBT College Canada CodeOps · Full Stack Software Development
 
----
-
-## 🏗️ State Architecture: Why Each Piece of State Lives Where It Does
-
-### 1. Why the Cart Lives in a Zustand Store
-- **Frequent, localized updates without tree-wide re-renders**: Cart state changes frequently (adding/removing dishes, changing quantities). React Context re-renders every consuming component whenever any part of its value changes. Zustand enables granular, narrow selectors (`useCartStore((state) => state.items.length)`) so components like `Header` never re-render when a dish is added—only the `CartBadge` updates.
-- **Built-in persistence middleware**: With Zustand's `persist` middleware, cart items automatically sync with `localStorage` and hydrate seamlessly upon page reload/refresh.
-- **Decoupled from React lifecycle**: Actions (`addItem`, `remove`, `clear`) are defined directly on the store and can be invoked anywhere without wrapping the component tree in context providers or passing dispatchers.
-
-### 2. Why the Auth Session Stays in React Context
-- **Low-frequency, global broadcast data**: The authentication session changes rarely (upon login or logout) and represents ambient global state that gatekeeps route accessibility and app-level layout elements.
-- **Natural integration with React Router tree & guards**: Keeping session state in `AuthProvider` provides clear encapsulation for the route tree (`RequireAuth`), exposing a guarded hook (`useAuth`) that throws an actionable error if invoked outside its provider.
-- **Separation of concerns**: Auth and theme are separated into dedicated, single-purpose providers (`AuthProvider`, `ThemeProvider`) rather than being bundled into a monolithic value.
+A complete, production-grade checkout form that handles all six states honestly. Four fields in one state object, rules in a pure function, errors that appear when they help rather than nag, accessible screen reader feedback (`role="alert"`, `aria-invalid`, `aria-describedby`), greyscale-friendly visual error cues, and a resilient submit flow that cannot fire twice or lose order details when the network fails.
 
 ---
 
-## 🗺️ Route Table
+## 📋 Architecture & Core Requirements
 
-| Route Path | Component | Auth Required | State Source | Description |
-| :--- | :--- | :---: | :--- | :--- |
-| `/` | `Layout` > `Home` | No | `useAuth`, `useTheme` | Landing page with hero banner and quick navigation. |
-| `/menu` | `Layout` > `Menu` | No | `useFetch`, `useCartStore` (actions) | Browse menu dishes with category filtering and instant search. |
-| `/menu/:id` | `Layout` > `DishDetail` | No | `useFetch`, `useCartStore` (actions) | Dynamic route with detailed dish view and add-to-cart action. |
-| `/cart` | `Layout` > `Cart` | No | `useCartStore` (narrow selectors) | Shopping cart screen with item removal, clear, and derived totals. |
-| `/checkout` | `Layout` > `RequireAuth` > `Checkout` | **Yes** | `useAuth`, `useCartStore` | Protected checkout panel and customer order submission. |
-| `/login` | `Layout` > `Login` | No | `useAuth` | Single-click authentication with redirect back to target route. |
-| `*` | `Layout` > `NotFound` | No | None | 404 catch-all screen with navigation fallback. |
-
----
-
-## 🧩 Store & Context Implementation
-
-### 1. Zustand Cart Store (`cartStore.js`)
-- **State**: `items` array
-- **Actions**: `addItem(dish)`, `remove(id)`, `clear()`
-- **Persistence**: `persist(..., { name: 'addis-eats-cart' })`
-- **Narrow selector usage example**:
-```javascript
-// Narrow selector: only re-renders when count changes
-const itemCount = useCartStore((state) => state.items.length);
-
-// Narrow selector: only selects the action, no re-render on items change
-const addItem = useCartStore((state) => state.addItem);
-```
-
-### 2. Guarded Context Hooks (`useAuth`, `useTheme`)
-- **`useAuth()`**: Accesses `user`, `isAuthenticated`, `login()`, `logout()`. Throws `'useAuth must be used within an AuthProvider'` if used outside provider.
-- **`useTheme()`**: Accesses `theme`, `toggleTheme()`. Throws `'useTheme must be used within a ThemeProvider'` if used outside provider.
+1. **Single State Object**: All four checkout fields (`name`, `phone`, `area`, `address`) are managed in one controlled `form` state object with a single `handleChange` handler.
+2. **Pure Validation Function**: `validate(form)` in `validate.js` is a pure function returning an `errors` object, derived on every render (`const errors = validate(form)`).
+3. **Helpful, Non-Nagging Errors**: Errors only appear after a field has been touched (`onBlur`), and update live on every keystroke as the customer corrects their input.
+4. **Accessible Semantics & Screen Readers**:
+   - Real `<label htmlFor={id}>` per field.
+   - Dynamic `aria-invalid` and `aria-describedby` linking to error alerts (`${id}-error`) and helper guides (`${id}-helper`).
+   - `role="alert"` and `aria-live="assertive"` on error announcements.
+   - Visible visual glyphs (`⚠️`) and high-contrast double borders ensuring errors are clear on greyscale screens.
+5. **Single-Submission Guarantee**:
+   - Submitting state disables the button and displays the live ETB total in its label (`Placing Order (${total} ETB)...`).
+   - Prevents duplicate clicks or rapid Enter key submissions.
+6. **Resilient Failure Path**:
+   - If network or gateway failure occurs, 100% of entered customer values are preserved in state.
+   - An alert banner is announced with `role="alert"`.
+   - Focus is automatically moved to the first invalid field.
 
 ---
 
-## 🛠️ Verification Checklist
+## 🏛️ Validation Rules & Why Each Exists
 
-- [x] **No CartProvider dependency**: Removing `CartProvider` does not break any cart functionality.
-- [x] **Optimized re-renders**: Adding a dish re-renders only `CartBadge` via narrow selector, leaving `Header` untouched.
-- [x] **State persistence**: Cart items and order survive full browser reloads.
-- [x] **Narrow selectors**: All consumers read specific slices (`items`, `addItem`, `remove`, `clear`, `length`).
-- [x] **Guarded context hooks**: `useAuth` and `useTheme` throw actionable error messages when called outside their providers.
-- [x] **Independent providers**: Auth and theme are split into separate `AuthProvider` and `ThemeProvider` components.
+| Field | Rule / Validation Logic | Why It Exists in Addis Ababa Context |
+| :--- | :--- | :--- |
+| **`name`** (Full Name) | `trim().length >= 2` | Food couriers need an identifiable person's name at delivery handoff or building reception. Single character inputs or blank spaces are rejected. |
+| **`phone`** (Phone Number) | Matches `/^(\+251\|0)9\d{8}$/` | Couriers call customers upon reaching security checkpoints, compound gates, or condominium entrances in Addis Ababa. Must be a valid Ethiopian mobile number (e.g. `0911234567` or `+251911234567`). |
+| **`area`** (Delivery Area) | Must be a recognized Addis Ababa sub-city (`Bole`, `Kazanchis`, `Summit`, `Piassa`, `Sarbet`, `CMC`, `Megenagna`, `Arat Kilo`, `Gerji`) | Delivery fees and dispatch route assignments rely strictly on the customer's sub-city zone. |
+| **`address`** (Street & Landmark) | `trim().length >= 5` | Addis Ababa lacks comprehensive postal house numbering. Couriers require specific street names, nearby landmarks, or building/floor numbers (minimum 5 characters) to prevent lost orders. |
 
 ---
 
-## 💻 Installation & Running
+## 🔄 The Six Honest Form States
+
+1. **Idle / Pristine State**:
+   - Initial form load. Untouched fields stay completely quiet and clean without any nagging red borders or premature error messages.
+2. **Validating / Touched State**:
+   - As fields lose focus (`onBlur`), they become marked as touched. Once touched, derived validation calculates errors live on every keystroke, clearing immediately when fixed.
+3. **Submitting State**:
+   - When submitted, the button enters `is-loading`, becomes disabled, and displays the ETB total in its label (`Placing Order (${total} ETB)...`), preventing duplicate orders.
+4. **Success State**:
+   - Order confirmation screen showing generated order ID, timestamp, summary of ordered dishes, delivery details, and final ETB amount. Cart is automatically cleared.
+5. **Failure / Network Error State**:
+   - Simulated or real network failures display an accessible `role="alert"` error banner. **All entered form values are 100% preserved**, and focus is automatically moved to the first invalid field for quick recovery.
+6. **Empty Cart State**:
+   - When the cart is empty (0 items / 0 ETB), checkout is safely disabled with friendly guidance and navigation back to the menu.
+
+---
+
+## ✅ Check Yourself
+
+| Question | Answer |
+| :--- | :--- |
+| **Does pressing Enter in a text field submit the form?** | **Yes.** The form is wrapped in a standard semantic `<form onSubmit={handleSubmit}>`, enabling native Enter-key submission from any input field. |
+| **Can you complete the whole form using only the keyboard?** | **Yes.** Full keyboard accessibility with logical `Tab` indexing, explicit `<label>` bindings, `:focus-visible` rings, and keyboard submit hints. |
+| **Does an untouched empty field stay quiet until you leave it?** | **Yes.** Errors are guarded by `show(field) = touched[field] && errors[field]`. Untouched fields never show error messages. |
+| **Does a corrected field clear its message immediately?** | **Yes.** `validate(form)` is derived on every render. As soon as the user types a valid input, the error clears immediately without requiring another blur event. |
+| **Does pressing Order twice quickly send only one order?** | **Yes.** The `status === 'submitting'` check immediately guards `handleSubmit`, and the submit button is simultaneously `disabled`. |
+| **After a simulated failure, is every value still in the form?** | **Yes.** The failure path never wipes the `form` state; only explicit user reset or successful order completion clears data. |
+| **Turn the screen greyscale — can you still tell which field is wrong?** | **Yes.** Invalid fields use warning glyphs (`⚠️`), distinct textual prefixes (`⚠️ Error:`), high-contrast double borders, and `aria-invalid` outlines that do not rely solely on color. |
+
+---
+
+## 📁 Key Files Submitted
+
+- **[`src/Checkout.jsx`](file:///c:/Users/hp/Desktop/Tehesh-Tslalom-Grmay-SQ7/module-03-react-nextjs/mini-projects/day01/src/Checkout.jsx)** / **[`src/components/Checkout.jsx`](file:///c:/Users/hp/Desktop/Tehesh-Tslalom-Grmay-SQ7/module-03-react-nextjs/mini-projects/day01/src/components/Checkout.jsx)**: Full checkout orchestrator managing all 6 states, single state object, and failure focus management.
+- **[`src/validate.js`](file:///c:/Users/hp/Desktop/Tehesh-Tslalom-Grmay-SQ7/module-03-react-nextjs/mini-projects/day01/src/validate.js)**: Pure, side-effect-free validation engine for all four fields.
+- **[`src/Field.jsx`](file:///c:/Users/hp/Desktop/Tehesh-Tslalom-Grmay-SQ7/module-03-react-nextjs/mini-projects/day01/src/Field.jsx)** / **[`src/components/Field.jsx`](file:///c:/Users/hp/Desktop/Tehesh-Tslalom-Grmay-SQ7/module-03-react-nextjs/mini-projects/day01/src/components/Field.jsx)**: Accessible input/select/textarea wrapper with `role="alert"`, `aria-invalid`, `aria-describedby`, and greyscale cues.
+
+---
+
+## 💻 Running the Project
 
 ```bash
 # Install dependencies
 npm install
 
-# Start development server
+# Start Vite dev server
 npm run dev
 
 # Build for production
