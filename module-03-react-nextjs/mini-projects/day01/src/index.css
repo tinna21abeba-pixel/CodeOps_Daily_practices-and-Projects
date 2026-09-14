@@ -1335,3 +1335,583 @@ body {
   font-size: 0.9rem;
 }
 
+/* ========================================================= */
+/* Accessible Modal & Portal Styles                          */
+/* ========================================================= */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-card {
+  background-color: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleUp {
+  from {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  font-size: 1.4rem;
+  color: var(--accent-amber);
+  margin: 0;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:focus-visible {
+  color: var(--text-main);
+  background-color: var(--bg-card-hover);
+  outline: 2px solid var(--accent-amber);
+}
+
+.modal-body-content {
+  padding: 20px 24px;
+}
+
+.dish-modal-badges {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.dish-category-badge {
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.dish-spicy-badge {
+  background-color: var(--accent-red-bg);
+  border: 1px solid var(--accent-red);
+  color: #f87171;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dish-modal-price {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent-amber-light);
+  margin-bottom: 14px;
+}
+
+.dish-modal-description {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.dish-modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tag-pill {
+  font-size: 0.82rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  color: var(--text-muted);
+}
+
+.dish-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color);
+  background-color: rgba(15, 23, 42, 0.4);
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.dish-modal-footer .modal-cancel-btn {
+  padding: 10px 18px;
+}
+
+.dish-modal-footer .modal-add-btn {
+  padding: 10px 20px;
+}
+
+/* Quick View and Action buttons on Card */
+.quick-view-btn {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-view-btn:hover,
+.quick-view-btn:focus-visible {
+  border-color: var(--accent-amber);
+  background-color: var(--bg-card-hover);
+  outline: 2px solid var(--accent-amber);
+}
+
+/* ========================================================= */
+/* Error Boundary & Fallback UIs                             */
+/* ========================================================= */
+.error-fallback-card,
+.error-boundary-fallback {
+  background-color: #1e1520;
+  border: 2px solid var(--accent-red);
+  border-radius: 14px;
+  padding: 28px 24px;
+  margin: 20px 0;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
+  animation: fadeIn 0.3s ease;
+}
+
+.fallback-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.fallback-icon,
+.error-fallback-icon {
+  font-size: 2.2rem;
+}
+
+.fallback-header h3,
+.error-fallback-title {
+  font-size: 1.35rem;
+  color: #fca5a5;
+  margin: 0;
+}
+
+.fallback-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+.fallback-details {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  margin-bottom: 20px;
+}
+
+.fallback-error-text {
+  color: #fca5a5;
+  font-family: monospace;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+}
+
+.fallback-reassurance {
+  color: #6ee7b7;
+  font-size: 0.92rem;
+}
+
+.fallback-actions,
+.error-fallback-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dish-error-card {
+  background-color: #1c141a !important;
+  border: 1.5px dashed var(--accent-red) !important;
+  border-radius: 12px;
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.dish-fallback-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dish-error-icon {
+  font-size: 1.8rem;
+}
+
+.dish-fallback-inner h4 {
+  color: #fca5a5;
+  font-size: 1rem;
+}
+
+.dish-error-msg {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.retry-dish-btn {
+  margin-top: 6px;
+  background-color: var(--accent-red-bg);
+  border: 1px solid var(--accent-red);
+  color: #fca5a5;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.retry-dish-btn:hover {
+  background-color: rgba(239, 68, 68, 0.25);
+}
+
+/* ========================================================= */
+/* Suspense Skeleton Shimmer Loading                         */
+/* ========================================================= */
+.skeleton-container {
+  max-width: 720px;
+  margin: 30px auto;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 32px 28px;
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerAnim 1.5s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmerAnim {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-title {
+  height: 32px;
+  width: 50%;
+  margin-bottom: 12px;
+}
+
+.skeleton-subtitle {
+  height: 18px;
+  width: 75%;
+  margin-bottom: 24px;
+}
+
+.skeleton-box.preview-box {
+  height: 100px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.skeleton-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeleton-field {
+  height: 52px;
+  width: 100%;
+}
+
+.skeleton-submit {
+  height: 48px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ========================================================= */
+/* Deliberate Simulation Toolbar & Test Triggers             */
+/* ========================================================= */
+.simulation-toolbar {
+  background-color: rgba(245, 158, 11, 0.08);
+  border: 1px dashed var(--accent-amber);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.simulation-toolbar.compact {
+  margin-bottom: 12px;
+  padding: 6px 12px;
+}
+
+.deliberate-error-btn {
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--accent-red);
+  color: #fca5a5;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deliberate-error-btn:hover,
+.deliberate-error-btn:focus-visible {
+  background-color: rgba(239, 68, 68, 0.35);
+  color: #ffffff;
+  outline: 2px solid var(--accent-red);
+}
+
+.simulation-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.dish-debug-actions {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  text-align: right;
+}
+
+.crash-dish-btn {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crash-dish-btn:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ========================================================= */
+/* Receipt View (/receipt)                                   */
+/* ========================================================= */
+.receipt-screen-container {
+  max-width: 680px;
+  margin: 30px auto;
+}
+
+.receipt-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 36px 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.receipt-header {
+  text-align: center;
+}
+
+.receipt-badge {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.receipt-header h2 {
+  font-size: 1.8rem;
+  color: var(--accent-amber);
+}
+
+.receipt-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.receipt-order-ref {
+  font-size: 1.05rem;
+}
+
+.receipt-time {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.receipt-divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 24px 0;
+}
+
+.receipt-section h3 {
+  font-size: 1.1rem;
+  color: var(--text-main);
+  margin-bottom: 14px;
+}
+
+.receipt-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+}
+
+.receipt-row .label {
+  color: var(--text-muted);
+}
+
+.receipt-row .value {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.receipt-table th,
+.receipt-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.receipt-table th {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.receipt-table .text-right {
+  text-align: right;
+}
+
+.receipt-table tfoot th {
+  border-top: 1.5px solid var(--border-color);
+  font-size: 1.05rem;
+  padding-top: 14px;
+}
+
+.receipt-table .total-cell {
+  color: var(--accent-amber-light);
+  font-size: 1.25rem;
+}
+
+.receipt-footer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.print-btn {
+  padding: 10px 22px;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .no-print,
+  .main-nav,
+  .app-footer,
+  .simulation-toolbar,
+  .header {
+    display: none !important;
+  }
+
+  .receipt-card {
+    border: 1px solid #000;
+    box-shadow: none;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .receipt-table th,
+  .receipt-table td {
+    color: #000000;
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+

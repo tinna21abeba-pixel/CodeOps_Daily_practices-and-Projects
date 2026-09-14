@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import Header from './Header';
+import ErrorBoundary from './ErrorBoundary';
 import { useAuth } from '../context/AuthProvider';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -10,7 +11,10 @@ function Layout() {
 
   return (
     <div className={`app-layout theme-${theme}`}>
-      <Header />
+      <ErrorBoundary regionName="Header Navigation">
+        <Header />
+      </ErrorBoundary>
+
       <nav className="main-nav" aria-label="Main Navigation">
         <NavLink
           to="/"
@@ -38,6 +42,12 @@ function Layout() {
           Checkout
         </NavLink>
         <NavLink
+          to="/receipt"
+          className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+        >
+          Receipt
+        </NavLink>
+        <NavLink
           to="/login"
           className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
         >
@@ -48,7 +58,14 @@ function Layout() {
           className="theme-toggle-btn"
           onClick={toggleTheme}
           title="Toggle Theme"
-          style={{ marginLeft: 'auto', background: 'transparent', border: '1px solid currentColor', borderRadius: '4px', padding: '0.25rem 0.5rem', cursor: 'pointer' }}
+          style={{
+            marginLeft: 'auto',
+            background: 'transparent',
+            border: '1px solid currentColor',
+            borderRadius: '4px',
+            padding: '0.25rem 0.5rem',
+            cursor: 'pointer',
+          }}
         >
           {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
         </button>
@@ -59,7 +76,7 @@ function Layout() {
       </main>
 
       <footer className="app-footer">
-        <p>© 2026 Addis Eats · Authentic Ethiopian Cuisine</p>
+        <p>© 2026 Addis Eats · Authentic Ethiopian Cuisine · Hardened Architecture</p>
       </footer>
     </div>
   );
