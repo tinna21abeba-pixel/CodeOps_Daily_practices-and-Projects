@@ -1,97 +1,78 @@
-import React, { useState, useEffect } from "react";
-import Dish from "./Dish";
-import CategoryBar from "./CategoryBar";
-import OrderForm from "./OrderForm";
-import { useCartStore } from "../store/useCartStore";
+import React, { Profiler } from "react";
+import Menu from "./Menu";
+import CartPanel from "./CartPanel";
+import ErrorBoundary from "./ErrorBoundary";
 
-const categories = ["All", "main", "side"];
-
-function Main() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [dishes, setDishes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const totalItems = useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + (item.quantity || 1), 0)
-  );
-  const totalPrice = useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0)
-  );
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-
-    fetch("/dishes.json")
-      .then((res) => res.json())
-      .then((data) => setDishes(data))
-      .catch((err) => setError(err.message || "Failed to load dishes"))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const filteredMenu =
-    selectedCategory === "All"
-      ? dishes
-      : dishes.filter((dish) => dish.catagory === selectedCategory);
-
-  useEffect(() => {
-    document.title = `${filteredMenu.length} Dishes - Taste of Habesha`;
-  }, [filteredMenu.length]);
-
-  function renderList() {
-    if (loading) {
-      return (
-        <div className="status-container loading-state">
-          <div className="spinner"></div>
-          <p>Loading dishes...</p>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="status-container error-state">
-          <p>⚠️ {error}</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="menu-container">
-        {filteredMenu.map((dish) => (
-          <Dish
-            key={dish.id}
-            id={dish.id}
-            name={dish.name}
-            price={dish.price}
-            catagory={dish.catagory}
-            isSpicy={dish.isSpicy}
-          />
-        ))}
-      </div>
-    );
-  }
-
+function Main({
+  onOpenDishModal,
+  crashedDishId,
+  onTriggerCrash,
+  onResetMenuCrash,
+  onGoToCheckout,
+  onProfilerRender,
+}) {
   return (
-    <>
-      <main className="menu-container">
-        <h3>Number of Selected Items:{totalItems}</h3>
-        <h2>Total price: {totalPrice} ETB</h2>
+    <main className="main-content-layout">
+      <section className="menu-column">
+        <div className="section-title-wrap">
+          <h2>Our Traditional Dishes</h2>
+          <span className="section-tag">Fresh Daily</span>
+        </div>
 
-        <CategoryBar
-          categorys={categories}
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
+        <Profiler id="MenuComponent" onRender={onProfilerRender}>
+          <ErrorBoundary
+            onReset={onResetMenuCrash}
+            fallback={(error, reset) => (
+              <div className="boundary-fallback menu-fallback" role="alert">
+                <div className="fallback-header">
+                  <span className="fallback-icon">⚠️</span>
+                  <h3>Menu Error Caught by Boundary</h3>
+                </div>
+                <p className="fallback-msg">
+                  {error?.message || "An unexpected error occurred in the menu section."}
+                </p>
+                <div className="fallback-actions">
+                  <button className="retry-action-btn" onClick={reset}>
+                    Restore Menu
+                  </button>
+                </div>
+              </div>
+            )}
+          >
+            <Menu
+              onOpenDishModal={onOpenDishModal}
+              crashedDishId={crashedDishId}
+              onTriggerCrash={onTriggerCrash}
+            />
+          </ErrorBoundary>
+        </Profiler>
+      </section>
 
-        <p>Selected Category: {selectedCategory}</p>
-
-        {renderList()}
-
-        <OrderForm />
-      </main>
-    </>
+      <aside className="cart-column">
+        <Profiler id="CartPanelComponent" onRender={onProfilerRender}>
+          <ErrorBoundary
+            fallback={(error, reset) => (
+              <div className="boundary-fallback cart-fallback" role="alert">
+                <div className="fallback-header">
+                  <span className="fallback-icon">🛒⚠️</span>
+                  <h3>Cart Error Caught Independently</h3>
+                </div>
+                <p className="fallback-msg">
+                  {error?.message || "An error occurred inside the Cart panel."}
+                </p>
+                <div className="fallback-actions">
+                  <button className="retry-action-btn" onClick={reset}>
+                    Reset Cart Boundary
+                  </button>
+                </div>
+              </div>
+            )}
+          >
+            <CartPanel onGoToCheckout={onGoToCheckout} />
+          </ErrorBoundary>
+        </Profiler>
+      </aside>
+    </main>
   );
 }
 
