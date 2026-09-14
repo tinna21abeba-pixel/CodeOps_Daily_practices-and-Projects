@@ -1,8 +1,9 @@
-import React, { useRef, useEffect, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Dish from './Dish';
 import CategoryBar from './CategoryBar';
 import { useFetch } from '../hooks/useFetch';
+import { useCartStore } from '../cartStore';
 
 const CATEGORIES = ['All', 'main', 'side'];
 
@@ -11,12 +12,25 @@ function Menu() {
   const selectedCategory = searchParams.get('category') || 'All';
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [shouldCrashMenu, setShouldCrashMenu] = useState(false);
   const searchInputRef = useRef(null);
+
+  const addItem = useCartStore((state) => state.addItem);
+
+  // Stable callback for adding dish, ensuring React.memo on Dish doesn't break
+  const handleAddToCart = useCallback((dish) => {
+    addItem(dish);
+  }, [addItem]);
 
   // Auto-focus search input when menu mounts
   useEffect(() => {
     searchInputRef.current?.focus();
   }, []);
+
+  // Deliberate error throw to test Menu region ErrorBoundary
+  if (shouldCrashMenu) {
+    throw new Error('Deliberate rendering failure triggered in Menu region.');
+  }
 
   const { data, loading, error } = useFetch('/dishes.json');
 
@@ -51,6 +65,21 @@ function Menu() {
 
   return (
     <div className="menu-wrapper">
+      {/* Simulation toolbar for testing Error Boundaries */}
+      <div className="simulation-toolbar">
+        <button
+          type="button"
+          className="deliberate-error-btn"
+          onClick={() => setShouldCrashMenu(true)}
+          title="Throw deliberate error to test Menu ErrorBoundary"
+        >
+          💥 Crash Menu Region (Test Isolation)
+        </button>
+        <span className="simulation-hint">
+          Click to prove Menu failure doesn't take down Cart or Header
+        </span>
+      </div>
+
       <div className="menu-controls">
         <div className="search-box-container">
           <input
@@ -97,7 +126,7 @@ function Menu() {
         {!loading && !error && filteredDishes.length > 0 && (
           <div className="dishes-grid">
             {filteredDishes.map((dish) => (
-              <Dish key={dish.id} dish={dish} />
+              <Dish key={dish.id} dish={dish} onAddToCart={handleAddToCart} />
             ))}
           </div>
         )}

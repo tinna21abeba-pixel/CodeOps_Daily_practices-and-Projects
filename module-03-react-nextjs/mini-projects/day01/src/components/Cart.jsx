@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCartStore } from '../cartStore';
 
@@ -10,8 +10,30 @@ function Cart() {
     state.items.reduce((sum, item) => sum + item.price, 0)
   );
 
+  const [shouldCrashCart, setShouldCrashCart] = useState(false);
+
+  // Deliberate error demonstration for Cart ErrorBoundary
+  if (shouldCrashCart) {
+    throw new Error('Deliberate rendering failure triggered in Cart component.');
+  }
+
   return (
     <div className="cart-page">
+      {/* Simulation toolbar for testing Error Boundaries */}
+      <div className="simulation-toolbar">
+        <button
+          type="button"
+          className="deliberate-error-btn"
+          onClick={() => setShouldCrashCart(true)}
+          title="Throw deliberate error to test Cart ErrorBoundary"
+        >
+          💥 Crash Cart Region (Test Isolation)
+        </button>
+        <span className="simulation-hint">
+          Click to prove Cart failure doesn't take down Menu or Header
+        </span>
+      </div>
+
       <h2>🛒 Your Shopping Cart</h2>
 
       {items.length === 0 ? (
