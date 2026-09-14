@@ -1,1 +1,3 @@
-/* App-level specific overrides if needed */
+.app-container {
+  width: 100%;
+}

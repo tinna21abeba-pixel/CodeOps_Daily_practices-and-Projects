@@ -19,6 +19,24 @@ export const useCartStore = create(
           }
           return { items: [...state.items, { ...dish, quantity: 1 }] };
         }),
+      incrementQuantity: (id) =>
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === id
+              ? { ...item, quantity: (item.quantity || 1) + 1 }
+              : item
+          ),
+        })),
+      decrementQuantity: (id) =>
+        set((state) => ({
+          items: state.items
+            .map((item) =>
+              item.id === id
+                ? { ...item, quantity: (item.quantity || 1) - 1 }
+                : item
+            )
+            .filter((item) => item.quantity > 0),
+        })),
       remove: (id) =>
         set((state) => ({
           items: state.items.filter((item) => item.id !== id),
