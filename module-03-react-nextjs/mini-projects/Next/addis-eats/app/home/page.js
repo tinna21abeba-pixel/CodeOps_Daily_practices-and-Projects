@@ -9,9 +9,6 @@ export default function Home(){
       <Link href="/menu">
         View Menu
       </Link>
-     <Link href="/cart">
-      cart
-     </Link>
     </main>
     )
 }

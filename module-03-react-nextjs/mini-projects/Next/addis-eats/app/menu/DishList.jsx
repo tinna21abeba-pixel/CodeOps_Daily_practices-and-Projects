@@ -49,7 +49,7 @@ export default   function DishList({ selectedCategory }) {
           <div className="mt-6 flex gap-3">
             <Link
               href={`/menu/${dish.id}`}
-              className="flex-1 text-center bg-white text-zinc-900 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition"
+              className="flex-1 text-center bg-gray-300 text-zinc-900 py-2 rounded-lg font-semibold hover:bg-zinc-200 transition"
             >
               View Details
             </Link>
