@@ -12,7 +12,7 @@ export default function NavBar() {
       <Link href="/cart" className="hover:text-orange-600 transition-colors">
         Cart
       </Link>
-      <Link href="/checkout" className="hover:text-orange-600 transition-colors">
+      <Link href="/checkOut" className="hover:text-orange-600 transition-colors">
         Checkout
       </Link>
     </nav>
