@@ -1,19 +1,11 @@
-"use client";
-
 import dishes from "../data/Dishes";
+import Link from "next/link";
 
-export default function CategoryBar({
-  selectedCategory,
-  setSelectedCategory,
-}) {
+export default function CategoryBar({ selectedCategory }) {
   const uniqueCategories = [
     "all",
     ...new Set(dishes.map((dish) => dish.category)),
   ];
-
-  function handleChange(category) {
-    setSelectedCategory(category);
-  }
 
   return (
     <section>
@@ -23,9 +15,9 @@ export default function CategoryBar({
 
       <div className="flex flex-wrap lg:flex-col gap-2">
         {uniqueCategories.map((category) => (
-          <button
+          <Link
             key={category}
-            onClick={() => handleChange(category)}
+            href={`/menu?category=${category}`}
             className={`px-3.5 py-2 rounded-lg text-sm font-medium capitalize text-left transition-all cursor-pointer ${
               selectedCategory === category
                 ? "bg-orange-500 text-white shadow-sm"
@@ -33,9 +25,9 @@ export default function CategoryBar({
             }`}
           >
             {category}
-          </button>
+          </Link>
         ))}
       </div>
     </section>
   );
-}
+}

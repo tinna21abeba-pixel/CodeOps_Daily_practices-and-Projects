@@ -8,6 +8,7 @@ export default async function CheckOutPage() {
     <div>
       <h1>Checkout</h1>
 
+
       <p>
         User: {user?.value ?? "guest"}
       </p>
