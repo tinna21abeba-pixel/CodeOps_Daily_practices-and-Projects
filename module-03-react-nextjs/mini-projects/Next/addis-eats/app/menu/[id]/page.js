@@ -1,6 +1,7 @@
-import dishes from "../../data/dishes";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import dishes from "../../data/dishes";
+import AddToCartButton from "../AddToCartButton";
 
 export async function generateStaticParams() {
   return dishes.map((dish) => ({
@@ -37,13 +38,14 @@ export default async function DishDetails({ params }) {
         </h2>
 
         <div className="flex gap-4">
-          <button className="flex-1 bg-amber-500 hover:bg-amber-600 transition py-3 rounded-lg font-semibold text-white">
-            Add to Cart
-          </button>
+          <AddToCartButton
+            dish={dish}
+            className="flex-1 py-3 rounded-lg font-semibold text-white transition bg-amber-500 hover:bg-amber-600 text-center"
+          />
 
           <Link
             href="/menu"
-            className="flex-1 text-center bg-zinc-700 hover:bg-zinc-600 transition py-3 rounded-lg font-semibold text-white"
+            className="flex-1 text-center bg-zinc-800 hover:bg-zinc-700 transition py-3 rounded-lg font-semibold text-white border border-zinc-700"
           >
             Back to Menu
           </Link>

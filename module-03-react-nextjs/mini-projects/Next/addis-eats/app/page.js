@@ -4,7 +4,12 @@ export default async function HomePage() {
   await new Promise((resolve) => setTimeout(resolve, 100));
 
   return (
-    <main className="min-h-screen bg-zinc-950 flex items-center justify-center px-6">
+    <main className="min-h-screen bg-zinc-950 flex items-center justify-center px- 
+     h-screen bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage:
+          "url('https://typicalethiopian.com/wp-content/uploads/2022/02/8.-raw-meat.jpg')",
+      }}>
       <div className="max-w-3xl text-center">
         <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6">
           Welcome to

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 
-// Dynamic rendering required: reading cart session cookies and headers per request
 export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
