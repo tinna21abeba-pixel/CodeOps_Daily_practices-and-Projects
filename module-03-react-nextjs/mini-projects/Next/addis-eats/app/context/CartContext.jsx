@@ -1,13 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
 
 export const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
 
-  const addItem = (dish) => {
+  const addItem = useCallback((dish) => {
     setItems((prevItems) => {
       const existing = prevItems.find((item) => item.id === dish.id);
       if (existing) {
@@ -19,21 +19,22 @@ export function CartProvider({ children }) {
       }
       return [...prevItems, { ...dish, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const removeItem = (id) => {
+  const removeItem = useCallback((id) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
+  }, []);
 
-  const clearCart = () => {
-    setItems([]);
-  };
+  const clearCart = useCallback(() => {
+    setItems((prevItems) => (prevItems.length === 0 ? prevItems : []));
+  }, []);
 
-  return (
-    <CartContext.Provider value={{ items, addItem, removeItem, clearCart }}>
-      {children}
-    </CartContext.Provider>
+  const value = useMemo(
+    () => ({ items, addItem, removeItem, clearCart }),
+    [items, addItem, removeItem, clearCart]
   );
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
 export function useCart() {

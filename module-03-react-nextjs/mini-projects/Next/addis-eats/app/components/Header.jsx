@@ -19,6 +19,9 @@ export default function Header() {
         <Link href="/checkout" className="hover:text-amber-500 transition-colors">
           Checkout
         </Link>
+                <Link href="/orders" className="hover:text-amber-500 transition-colors">
+          Orders
+        </Link>
       </nav>
     </header>
   );
