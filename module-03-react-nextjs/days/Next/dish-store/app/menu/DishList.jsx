@@ -1,5 +1,6 @@
 import Link from "next/link";
 import dishes from "../data/Dishes";
+import AddToCartButton from "./AddToCartButton";
 
 export default async function DishList({ dishes: propDishes, selectedCategory }) {
   await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -48,6 +49,7 @@ export default async function DishList({ dishes: propDishes, selectedCategory })
               >
                 View Details
               </Link>
+              <AddToCartButton dish={dish}/>
             </div>
           </article>
         ))}
