@@ -3,6 +3,8 @@ import { getSession } from "../../lib/session";
 import { listOrdersByUser, toOwnerOrder } from "../../lib/store";
 import CancelOrderButton from "../CancelOrderButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function MyOrdersPage() {
   const session = await getSession();
   const orders = session ? listOrdersByUser(session.userId).map(toOwnerOrder) : [];

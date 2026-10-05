@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listOrders, toPublicOrder } from "../lib/store";
 
+export const dynamic = "force-dynamic";
 
 export default function OrdersBoardPage() {
   const orders = listOrders().map(toPublicOrder);

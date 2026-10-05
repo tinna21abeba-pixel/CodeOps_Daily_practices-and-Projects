@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import dishes from "../data/dishes";
 import FilterShell from "./FilterShell";
-import DishList from "./DishList";
+import MenuBrowser from "./MenuBrowser";
 
 export const revalidate = 60;
 
@@ -29,7 +29,7 @@ export default async function MenuPage({ searchParams }) {
   return (
     <FilterShell selectedCategory={selectedCategory} categories={categories}>
       <Suspense fallback={<MenuSkeleton />}>
-        <DishList selectedCategory={selectedCategory} />
+        <MenuBrowser selectedCategory={selectedCategory} />
       </Suspense>
     </FilterShell>
   );
