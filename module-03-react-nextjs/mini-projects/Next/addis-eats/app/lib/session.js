@@ -1,38 +1,42 @@
-import "server-only";
+import { SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import { COOKIE_NAME, getSecretKey, verifySessionToken, sanitizeNextUrl } from "./auth-core";
 
-const COOKIE = "ae_session";
-
-function secret() {
-  const s = process.env.SESSION_SECRET;
-  if (!s || s.length < 16) throw new Error("SESSION_SECRET is missing. Add it to .env.local");
-  return s;
-}
-
-const sign = (value) => createHmac("sha256", secret()).update(value).digest("hex");
-
+export { COOKIE_NAME, verifySessionToken, sanitizeNextUrl };
 
 export async function getSession() {
-  const raw = (await cookies()).get(COOKIE)?.value;
-  if (!raw) return null;
-  const [userId, signature] = raw.split(".");
-  if (!userId || !signature) return null;
-  const expected = Buffer.from(sign(userId));
-  const given = Buffer.from(signature);
-  if (expected.length !== given.length || !timingSafeEqual(expected, given)) return null;
-  return { userId };
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  return verifySessionToken(token);
 }
 
+export async function createSession(user) {
+  const token = await new SignJWT({
+    userId: user.id,
+    user: {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+    },
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(getSecretKey());
 
-export async function createSession() {
-  const userId = randomUUID();
-  (await cookies()).set(COOKIE, `${userId}.${sign(userId)}`, {
-    httpOnly: true, 
-    sameSite: "lax",
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, token, {
+    httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    path: "/",
+    sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7,
+    path: "/",
   });
-  return { userId };
+
+  return token;
+}
+
+export async function deleteSession() {
+  const cookieStore = await cookies();
+  cookieStore.delete(COOKIE_NAME);
 }

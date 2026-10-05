@@ -1,7 +1,13 @@
 import { submitOrder } from "../../lib/orders";
 import { errorResponse } from "../../lib/api";
+import { getSession } from "../../lib/session";
 
 export async function POST(request) {
+  const session = await getSession();
+  if (!session?.userId) {
+    return errorResponse(401, "UNAUTHENTICATED", "Unauthorized. Please sign in.");
+  }
+
   let body;
   try {
     body = await request.json();
