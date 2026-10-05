@@ -58,7 +58,7 @@ export default async function DishDetails({ params }) {
         href="/menu"
         className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer"
       >
-        &larr; Back to Menu
+        Back to Menu
       </Link>
     </main>
   );

@@ -3,8 +3,6 @@ import dishes from "../data/Dishes";
 import AddToCartButton from "./AddToCartButton";
 
 export default async function DishList({ dishes: propDishes, selectedCategory }) {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-
   const allDishes = propDishes || dishes;
   const filteredDishes =
     selectedCategory === "all"

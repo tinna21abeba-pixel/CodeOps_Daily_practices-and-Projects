@@ -1,7 +1,13 @@
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import dishes from "../data/Dishes";
 import Link from "next/link";
 
-export default function CategoryBar({ selectedCategory }) {
+export default function CategoryBar({ selectedCategory: propCategory }) {
+  const searchParams = useSearchParams();
+  const selectedCategory = propCategory || searchParams?.get("category") || "all";
+
   const uniqueCategories = [
     "all",
     ...new Set(dishes.map((dish) => dish.category)),

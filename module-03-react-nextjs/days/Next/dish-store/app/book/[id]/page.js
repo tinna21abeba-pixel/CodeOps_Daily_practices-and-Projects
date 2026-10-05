@@ -30,7 +30,7 @@ export default async function SinglePage({ params }) {
         href="/menu"
         className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
       >
-        &larr; Back to Menu
+        Back to Menu
       </Link>
     </div>
   );
