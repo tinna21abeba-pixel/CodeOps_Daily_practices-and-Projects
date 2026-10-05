@@ -30,6 +30,13 @@ export async function createOrder(prevState, formData) {
 
   const session = await getSession();
 
+  if (!session?.user) {
+    return {
+      fieldErrors: {},
+      message: "Unauthorized. Please sign in to create an order.",
+    };
+  }
+
   const order = {
     id: Date.now(),
     userId: session.user.id,
@@ -40,7 +47,8 @@ export async function createOrder(prevState, formData) {
 
   addOrder(order);
 
-  revalidatePath("/checkOut");
+  revalidatePath("/checkout");
+  revalidatePath("/orders");
 
   return {
     fieldErrors: {},
@@ -76,7 +84,8 @@ export async function cancelOrder(orderId) {
 
   cancelOrderById(orderId);
 
-  revalidatePath("/checkOut");
+  revalidatePath("/checkout");
+  revalidatePath("/orders");
 
   return {
     success: true,
