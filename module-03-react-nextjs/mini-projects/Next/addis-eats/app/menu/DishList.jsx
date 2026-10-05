@@ -1,16 +1,10 @@
 import Link from "next/link";
-import dishes from "../data/dishes";
 import AddToCartButton from "./AddToCartButton";
 
-export default function DishList({ selectedCategory = "All" }) {
-  const filteredDishes =
-    selectedCategory === "All"
-      ? dishes
-      : dishes.filter((dish) => dish.category === selectedCategory);
-
+export default function DishList({ dishes = [] }) {
   return (
     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {filteredDishes.map((dish) => (
+      {dishes.map((dish) => (
         <div
           key={dish.id}
           className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1 transition duration-300 flex flex-col justify-between"

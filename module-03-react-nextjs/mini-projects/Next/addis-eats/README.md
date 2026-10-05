@@ -2,7 +2,7 @@
 
 ## Build Output
 
-```text
+
 Route (app)            Revalidate  Expire
 ┌ ○ /
 ├ ○ /_not-found
@@ -35,4 +35,10 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Network Tab Behavior While Typing
+
+- Debounce: Keystrokes in the search box are debounced by 400 ms. Typing five characters in succession fires exactly one network request (`/api/dishes?q=...`) once typing pauses, rather than five separate requests.
+- Empty Search Term: When the input is cleared, the query key evaluates to `null`. SWR does not issue a network request for a null key.
+- No Flash: While a new query is in flight, `keepPreviousData: true` ensures the prior result set remains rendered on screen without flashing empty.
+- Cache Deduplication: Identical searches within the 30-second `dedupingInterval` serve from cache without hitting the network.

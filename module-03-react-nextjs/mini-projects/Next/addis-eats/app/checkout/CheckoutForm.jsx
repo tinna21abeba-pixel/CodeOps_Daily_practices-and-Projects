@@ -32,6 +32,12 @@ export default function CheckoutForm() {
         <Link href="/orders/mine" className="inline-block bg-amber-500 hover:bg-amber-600 transition px-6 py-3 rounded-lg font-semibold text-white">
           View my orders
         </Link>
+        <Link
+          href={`/orders/${state.orderId}`}
+          className="inline-block ml-3 border border-amber-500 text-amber-500 px-6 py-3 rounded-lg font-semibold hover:bg-amber-500/10 transition"
+        >
+          Track order
+        </Link>
       </div>
     );
   }
