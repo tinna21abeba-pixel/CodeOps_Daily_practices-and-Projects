@@ -17,9 +17,10 @@ export default function OrderSearch() {
     return () => clearTimeout(timer);
   }, [term]);
 
-  useEffect(() => {
+  const handleTermChange = (e) => {
+    setTerm(e.target.value);
     setPage(1);
-  }, [debouncedTerm]);
+  };
 
   const { data, error, isLoading, isValidating } = useSWR(
     debouncedTerm
@@ -40,7 +41,7 @@ export default function OrderSearch() {
       <input
         type="text"
         value={term}
-        onChange={(e) => setTerm(e.target.value)}
+        onChange={handleTermChange}
         placeholder="Search by customer name..."
         className="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-6 bg-white text-stone-900 placeholder-stone-400"
       />

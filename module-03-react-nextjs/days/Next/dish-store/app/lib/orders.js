@@ -1,6 +1,7 @@
 let orders = [
   {
     id: 1,
+    userId: "user-1",
     customerName: "Tehesh",
     phone: "0911223344",
     food: "Doro Wat",
@@ -11,6 +12,7 @@ let orders = [
   },
   {
     id: 2,
+    userId: "user-1",
     customerName: "Tehesh",
     phone: "0911223344",
     food: "Kitfo",
@@ -21,6 +23,7 @@ let orders = [
   },
   {
     id: 3,
+    userId: "user-1",
     customerName: "Tehesh",
     phone: "0911223344",
     food: "Shiro",
@@ -31,6 +34,7 @@ let orders = [
   },
   {
     id: 4,
+    userId: "user-1",
     customerName: "Tehesh",
     phone: "0911223344",
     food: "Tibs",
@@ -41,6 +45,7 @@ let orders = [
   },
   {
     id: 5,
+    userId: "user-1",
     customerName: "Tehesh",
     phone: "0911223344",
     food: "Alicha Wot",
@@ -51,6 +56,7 @@ let orders = [
   },
   {
     id: 6,
+    userId: "user-2",
     customerName: "Abebe",
     phone: "0922334455",
     food: "Beg Wot",
@@ -61,6 +67,7 @@ let orders = [
   },
   {
     id: 123,
+    userId: "user-1",
     customerName: "Tehesh",
     phone: "0911223344",
     food: "Doro Wat",
@@ -73,6 +80,10 @@ let orders = [
 
 export function getOrders() {
   return orders;
+}
+
+export function getOrdersByUserId(userId) {
+  return orders.filter((order) => order.userId === userId);
 }
 
 export function addOrder(order) {
