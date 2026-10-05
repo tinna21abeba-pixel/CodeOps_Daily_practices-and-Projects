@@ -3,11 +3,15 @@
 import useSWR from "swr";
 import fetcher from "@/app/lib/fetcher";
 
-export default function OrderStatus({ orderId }) {
+export default function OrderStatus({ orderId, intialorder }) {
   const { data, error, isLoading } = useSWR(
     `/api/orders/${orderId}`,
     fetcher,
-    { refreshInterval: 5000 }
+    { refreshInterval: 5000,
+      fallbackData:{
+        order:intialorder,
+      }
+     }
   );
 
   if (isLoading) return <div>Loading...</div>;

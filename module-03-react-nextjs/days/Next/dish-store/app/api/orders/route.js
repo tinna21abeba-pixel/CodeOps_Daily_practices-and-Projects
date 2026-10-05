@@ -6,6 +6,15 @@ export async function POST(request) {
     const body = await request.json();
 
     const result = orderSchema.safeParse(body);
+     const search = request.nextUrl.searchParams.get("search") || "";
+
+  const orders = await getOrders();
+
+  const filteredOrders = orders.filter((order) =>
+    order.customerName
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
 
     if (!result.success) {
       return NextResponse.json(
