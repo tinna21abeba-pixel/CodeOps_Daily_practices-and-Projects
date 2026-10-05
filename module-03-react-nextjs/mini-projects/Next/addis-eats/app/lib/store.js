@@ -1,8 +1,36 @@
 import "server-only";
 import dishes from "../data/dishes";
 
+globalThis.__addisEatsDb ??= {
+  orders: [
+    {
+      id: "ORD-1001",
+      userId: "user-1",
+      name: "Tehesh",
+      phone: "+251911223344",
+      address: "Bole, Addis Ababa",
+      note: "Extra injera please",
+      items: [{ dishId: 1, name: "Doro Wat", price: 320, quantity: 1 }],
+      total: 320,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "ORD-1002",
+      userId: "user-2",
+      name: "Abebe",
+      phone: "+251922334455",
+      address: "Kazanchis, Addis Ababa",
+      note: "Mild spice",
+      items: [{ dishId: 2, name: "Tibs", price: 280, quantity: 2 }],
+      total: 560,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    },
+  ],
+  nextId: 1003,
+};
 
-globalThis.__addisEatsDb ??= { orders: [], nextId: 1001 };
 const db = globalThis.__addisEatsDb;
 
 export function listDishes(category) {
@@ -11,6 +39,7 @@ export function listDishes(category) {
     (d) => d.category.toLowerCase() === category.toLowerCase()
   );
 }
+
 export function queryDishes({ category, q, page, pageSize = 4 } = {}) {
   let result = listDishes(category);
 
@@ -45,11 +74,11 @@ export function findDish(id) {
 }
 
 export function insertOrder({ userId, name, phone, address, note, items }) {
-
   const lines = items.map(({ dishId, quantity }) => {
     const dish = findDish(dishId);
     return { dishId, name: dish.name, price: dish.price, quantity };
   });
+
   const order = {
     id: `ORD-${db.nextId++}`,
     userId,
@@ -62,19 +91,19 @@ export function insertOrder({ userId, name, phone, address, note, items }) {
     status: "pending",
     createdAt: new Date().toISOString(),
   };
+
   db.orders.unshift(order);
   return order;
 }
 
 export const listOrders = () => db.orders;
+
 export const listOrdersByUser = (userId) =>
   db.orders.filter((o) => o.userId === userId);
-
 
 export function toPublicOrder(o) {
   return { id: o.id, items: o.items, total: o.total, status: o.status, createdAt: o.createdAt };
 }
-
 
 function advance(order) {
   if (!order || order.status === "cancelled" || order.status === "delivered") return order;
