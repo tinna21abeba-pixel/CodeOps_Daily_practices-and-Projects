@@ -1,5 +1,6 @@
 import dishes from "@/app/data/Dishes";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export function generateStaticParams() {
@@ -35,6 +36,17 @@ export default async function DishDetails({ params }) {
             {dish.category}
           </span>
         </div>
+
+        {dish.image && (
+          <Image
+            src={dish.image}
+            alt={dish.name}
+            width={800}
+            height={450}
+            sizes="(max-width: 768px) 100vw, 600px"
+            className="w-full h-64 object-cover rounded-xl mb-6 shadow-sm"
+          />
+        )}
 
         <p className="text-stone-600 text-sm leading-relaxed mb-6">
           {dish.description}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -9,6 +10,16 @@ export default function Home() {
         <p className="text-stone-800 font-medium text-lg mb-2">
           Welcome to Habesha Restaurant.
         </p>
+
+        <Image
+          src="/images/homePage.png"
+          alt="Habesha Restaurant Ethiopian Feast"
+          width={1200}
+          height={600}
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+          className="w-full h-64 object-cover rounded-xl mb-6 shadow-sm"
+        />
 
         <p className="text-stone-600 text-sm leading-relaxed mb-6">
           Enjoy authentic Ethiopian dishes made with traditional ingredients and spices.
