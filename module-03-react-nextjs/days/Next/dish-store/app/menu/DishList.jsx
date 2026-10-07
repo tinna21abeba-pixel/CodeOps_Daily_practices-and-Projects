@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import dishes from "../data/Dishes";
 import AddToCartButton from "./AddToCartButton";
 
@@ -18,6 +19,16 @@ export default async function DishList({ dishes: propDishes, selectedCategory })
             className="bg-white border border-stone-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
           >
             <div>
+              {dish.image && (
+                <Image
+                  src={dish.image}
+                  alt={dish.name}
+                  width={400}
+                  height={250}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                  className="w-full h-40 object-cover rounded-lg mb-3"
+                />
+              )}
               <div className="flex items-start justify-between gap-2 mb-2">
                 <h3 className="font-bold text-base text-stone-900">
                   {dish.name}
