@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import AddToCartButton from "./AddToCartButton";
 
@@ -10,6 +11,17 @@ export default function DishList({ dishes = [] }) {
           className="bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-800 shadow-lg hover:shadow-amber-500/10 hover:-translate-y-1 transition duration-300 flex flex-col justify-between"
         >
           <div className="p-6 flex flex-col flex-1">
+            {dish.image && (
+              <Image
+                src={dish.image}
+                alt={dish.name}
+                width={400}
+                height={250}
+                sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                className="w-full h-48 object-cover rounded-xl mb-4"
+              />
+            )}
+
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-2xl font-bold text-white">
                 {dish.name}

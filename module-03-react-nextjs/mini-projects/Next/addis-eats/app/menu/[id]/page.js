@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import dishes from "../../data/dishes";
 import AddToCartButton from "../AddToCartButton";
@@ -28,6 +29,17 @@ export default async function DishDetails({ params }) {
         <h1 className="text-4xl font-bold mb-4 text-white">
           {dish.name}
         </h1>
+
+        {dish.image && (
+          <Image
+            src={dish.image}
+            alt={dish.name}
+            width={800}
+            height={450}
+            sizes="(max-width: 768px) 100vw, 600px"
+            className="w-full h-64 object-cover rounded-xl mb-6 shadow-sm"
+          />
+        )}
 
         <p className="text-zinc-300 leading-7 mb-6">
           {dish.description}
