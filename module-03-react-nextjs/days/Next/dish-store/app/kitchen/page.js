@@ -5,6 +5,11 @@ import { getOrders } from "@/app/lib/orders";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Kitchen Display",
+  description: "Staff view to track active food preparations and manage restaurant orders in real time.",
+};
+
 export default async function KitchenPage() {
   const session = await getSession();
 

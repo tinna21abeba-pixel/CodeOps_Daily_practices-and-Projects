@@ -5,6 +5,8 @@ const dishes = [
     category: "Main Dish",
     price: 240,
     image: "/images/dorowet.png",
+    summary:
+      "Traditional Ethiopian chicken stew cooked with berbere, onions, butter, and spices.",
     description:
       "Traditional Ethiopian chicken stew cooked with berbere, onions, butter, and spices.",
   },
@@ -14,6 +16,8 @@ const dishes = [
     category: "Main Dish",
     price: 300,
     image: "/images/chiken.png",
+    summary:
+      "Tender pieces of beef sautéed with onions, peppers, rosemary, and Ethiopian spices.",
     description:
       "Tender pieces of beef sautéed with onions, peppers, rosemary, and Ethiopian spices.",
   },
@@ -23,6 +27,8 @@ const dishes = [
     category: "Main Dish",
     price: 350,
     image: "/images/homePage.png",
+    summary:
+      "Traditional Ethiopian minced beef dish seasoned with mitmita and clarified butter.",
     description:
       "Traditional Ethiopian minced beef dish seasoned with mitmita and clarified butter.",
   },
@@ -32,6 +38,8 @@ const dishes = [
     category: "Vegetarian",
     price: 150,
     image: "/images/backgound.png",
+    summary:
+      "Smooth chickpea stew prepared with Ethiopian spices and served with injera.",
     description:
       "Smooth chickpea stew prepared with Ethiopian spices and served with injera.",
   },
@@ -41,6 +49,8 @@ const dishes = [
     category: "Vegetarian",
     price: 180,
     image: "/images/dorowet.png",
+    summary:
+      "Mild Ethiopian stew prepared with vegetables, turmeric, onions, and spices.",
     description:
       "Mild Ethiopian stew prepared with vegetables, turmeric, onions, and spices.",
   },
@@ -50,6 +60,8 @@ const dishes = [
     category: "Main Dish",
     price: 320,
     image: "/images/chiken.png",
+    summary:
+      "Flavorful Ethiopian lamb stew prepared with onions, berbere, and traditional spices.",
     description:
       "Flavorful Ethiopian lamb stew prepared with onions, berbere, and traditional spices.",
   },

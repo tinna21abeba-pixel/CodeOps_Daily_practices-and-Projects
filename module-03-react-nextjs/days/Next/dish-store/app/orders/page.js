@@ -6,6 +6,11 @@ import { cancelOrder } from "@/app/actions/orders";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "My Orders",
+  description: "View your order history and track the current delivery status of your meals.",
+};
+
 export default async function OrdersPage() {
   const session = await getSession();
 

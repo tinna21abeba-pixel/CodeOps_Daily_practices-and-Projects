@@ -1,6 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 
+export const metadata = {
+  title: "Home",
+  description: "Welcome to Habesha Restaurant. Explore authentic Ethiopian dishes, savory stews, and traditional dining.",
+};
+
 export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center text-center py-12 md:py-20 px-4">
