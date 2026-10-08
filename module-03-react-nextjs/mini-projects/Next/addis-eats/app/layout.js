@@ -1,17 +1,14 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Providers from "./Providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -23,7 +20,7 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${plusJakartaSans.className} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-white">
         <Providers>
@@ -33,6 +30,10 @@ export default function RootLayout({ children }) {
           </main>
           <Footer />
         </Providers>
+        <Script
+          src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );

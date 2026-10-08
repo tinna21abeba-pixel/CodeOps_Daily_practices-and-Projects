@@ -18,7 +18,7 @@ export default async function CheckoutPage() {
         <p className="text-zinc-300 mb-8 text-center text-sm">
           Signed in as <span className="font-semibold text-white">{session.user?.name}</span> ({session.user?.role})
         </p>
-        <CheckoutForm />
+        <CheckoutForm/>
       </div>
     </div>
   );
