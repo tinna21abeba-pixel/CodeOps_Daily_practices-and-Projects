@@ -5,6 +5,18 @@ import { listOrders } from "../lib/store";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Staff Kitchen Board",
+  description: "Manage incoming kitchen orders and update real-time fulfillment status for Addis Eats staff.",
+  alternates: {
+    canonical: "/staff",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function StaffPage() {
   const session = await getSession();
 

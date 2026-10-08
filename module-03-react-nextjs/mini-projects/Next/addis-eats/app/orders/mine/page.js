@@ -6,6 +6,18 @@ import CancelOrderButton from "../CancelOrderButton";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "My Orders",
+  description: "Track your active orders and review your complete Ethiopian food delivery order history.",
+  alternates: {
+    canonical: "/orders/mine",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function MyOrdersPage() {
   const session = await getSession();
 

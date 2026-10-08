@@ -10,6 +10,37 @@ export async function generateStaticParams() {
   }));
 }
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const dish = dishes.find((item) => item.id.toString() === id);
+
+  if (!dish) {
+    return {
+      title: "Dish Not Found",
+      description: "The requested Ethiopian dish could not be found.",
+    };
+  }
+
+  return {
+    title: dish.name,
+    description: dish.description,
+    alternates: {
+      canonical: `/menu/${dish.id}`,
+    },
+    openGraph: {
+      title: `${dish.name} | Addis Eats`,
+      description: dish.description,
+      url: `/menu/${dish.id}`,
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${dish.name} | Addis Eats`,
+      description: dish.description,
+    },
+  };
+}
+
 export default async function DishDetails({ params }) {
   const { id } = await params;
 
@@ -19,8 +50,27 @@ export default async function DishDetails({ params }) {
     notFound();
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://addis-eats.vercel.app";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MenuItem",
+    name: dish.name,
+    description: dish.description,
+    image: dish.image ? `${baseUrl}${dish.image}` : undefined,
+    offers: {
+      "@type": "Offer",
+      price: dish.price,
+      priceCurrency: "ETB",
+    },
+  };
+
   return (
     <div className="max-w-4xl mx-auto flex items-center justify-center py-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="w-full bg-zinc-900 rounded-2xl shadow-xl overflow-hidden border border-zinc-800 p-8">
         <span className="inline-block bg-amber-500 text-white px-4 py-1 rounded-full text-sm mb-4 font-semibold">
           {dish.category}

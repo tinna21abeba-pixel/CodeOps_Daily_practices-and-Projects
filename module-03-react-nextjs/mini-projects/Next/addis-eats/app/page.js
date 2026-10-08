@@ -1,6 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
+export const metadata = {
+  title: "Authentic Ethiopian Dining",
+  description: "Experience authentic Ethiopian cuisine prepared with traditional spices, heritage recipes, and fresh ingredients in Addis Ababa.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Addis Eats | Authentic Ethiopian Dining",
+    description: "Experience authentic Ethiopian cuisine prepared with traditional spices, heritage recipes, and fresh ingredients in Addis Ababa.",
+    url: "/",
+  },
+};
+
 export default async function HomePage() {
   await new Promise((resolve) => setTimeout(resolve, 100));
 

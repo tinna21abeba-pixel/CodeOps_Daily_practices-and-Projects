@@ -3,6 +3,19 @@ import { signIn, signOut } from "../actions/auth";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Sign In",
+  description: "Sign in to your Addis Eats account to manage orders, browse dishes, and complete checkout.",
+  alternates: {
+    canonical: "/sign-in",
+  },
+  openGraph: {
+    title: "Sign In | Addis Eats",
+    description: "Sign in to your Addis Eats account to manage orders, browse dishes, and complete checkout.",
+    url: "/sign-in",
+  },
+};
+
 export default async function SignInPage({ searchParams }) {
   const params = await searchParams;
   const rawNext = params?.next || "/orders/mine";
