@@ -1,6 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
+export const metadata = {
+  title: "Welcome",
+  description: "Experience the authentic taste of Ethiopian cuisine with our curated selection of traditional culinary specialties.",
+  alternates: {
+    canonical: "/home",
+  },
+  openGraph: {
+    title: "Welcome | Addis Eats",
+    description: "Experience the authentic taste of Ethiopian cuisine with our curated selection of traditional culinary specialties.",
+    url: "/home",
+  },
+};
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-center">

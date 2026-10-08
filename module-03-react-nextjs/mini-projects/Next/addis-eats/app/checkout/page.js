@@ -4,6 +4,18 @@ import CheckoutForm from "./CheckoutForm";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Checkout",
+  description: "Complete your Ethiopian food order with delivery details and contact information.",
+  alternates: {
+    canonical: "/checkout",
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function CheckoutPage() {
   const session = await getSession();
 

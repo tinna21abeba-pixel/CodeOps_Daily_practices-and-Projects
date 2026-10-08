@@ -5,6 +5,19 @@ import MenuBrowser from "./MenuBrowser";
 
 export const revalidate = 60;
 
+export const metadata = {
+  title: "Menu",
+  description: "Explore our full menu of traditional Ethiopian dishes including tender beef tibs, doro wat, fresh fish, and vegetarian combinations.",
+  alternates: {
+    canonical: "/menu",
+  },
+  openGraph: {
+    title: "Menu | Addis Eats",
+    description: "Explore our full menu of traditional Ethiopian dishes including tender beef tibs, doro wat, fresh fish, and vegetarian combinations.",
+    url: "/menu",
+  },
+};
+
 function MenuSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">

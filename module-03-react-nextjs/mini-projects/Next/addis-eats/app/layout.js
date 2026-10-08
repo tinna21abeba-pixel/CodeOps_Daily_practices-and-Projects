@@ -12,8 +12,27 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "Addis Eats",
-  description: "Authentic Ethiopian cuisine",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://addis-eats.vercel.app"
+  ),
+  title: {
+    default: "Addis Eats",
+    template: "%s | Addis Eats",
+  },
+  description: "Authentic Ethiopian culinary traditions, hearty stews, and vegetarian feasts delivered in Addis Ababa.",
+  openGraph: {
+    title: "Addis Eats",
+    description: "Authentic Ethiopian culinary traditions, hearty stews, and vegetarian feasts delivered in Addis Ababa.",
+    url: "/",
+    siteName: "Addis Eats",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Addis Eats",
+    description: "Authentic Ethiopian culinary traditions, hearty stews, and vegetarian feasts delivered in Addis Ababa.",
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -6,6 +6,21 @@ import OrderStatus from "./OrderStatus";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  return {
+    title: `Order ${id}`,
+    description: `View real-time delivery status and order summary for order ${id} at Addis Eats.`,
+    alternates: {
+      canonical: `/orders/${id}`,
+    },
+    robots: {
+      index: false,
+      follow: false,
+    },
+  };
+}
+
 export default async function OrderPage({ params }) {
   const { id } = await params;
   const session = await getSession();
