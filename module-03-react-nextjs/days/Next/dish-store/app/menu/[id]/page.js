@@ -9,6 +9,29 @@ export function generateStaticParams() {
   }));
 }
 
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  const dish = dishes.find((dish) => String(dish.id) === String(id));
+
+  if (!dish) {
+    return {
+      title: "Dish Not Found",
+      description: "The requested dish does not exist.",
+    };
+  }
+
+  const summary = dish.summary || dish.description;
+
+  return {
+    title: `${dish.name} - ${dish.price} ETB`,
+    description: `${dish.name} (${dish.price} ETB): ${summary}`,
+    openGraph: {
+      title: `${dish.name} - ${dish.price} ETB`,
+      description: `${dish.name} (${dish.price} ETB): ${summary}`,
+    },
+  };
+}
+
 export default async function DishDetails({ params }) {
   const { id } = await params;
 
@@ -20,8 +43,28 @@ export default async function DishDetails({ params }) {
     notFound();
   }
 
+  const summary = dish.summary || dish.description;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MenuItem",
+    name: dish.name,
+    description: summary,
+    image: dish.image,
+    offers: {
+      "@type": "Offer",
+      price: dish.price,
+      priceCurrency: "ETB",
+    },
+  };
+
   return (
     <main className="max-w-xl mx-auto py-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <h1 className="text-xl font-bold text-stone-900 mb-4">
         Dish Details
       </h1>

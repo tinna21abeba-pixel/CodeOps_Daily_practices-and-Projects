@@ -3,6 +3,11 @@ import { signIn, signOut } from "@/app/actions/auth";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Sign In",
+  description: "Sign in to your Habesha Restaurant account to access order history and role-based features.",
+};
+
 export default async function SignInPage({ searchParams }) {
   const params = await searchParams;
   const nextDestination = params?.next || "/orders";

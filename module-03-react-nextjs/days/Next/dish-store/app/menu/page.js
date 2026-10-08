@@ -4,6 +4,11 @@ import DishList from "./DishList";
 
 export const revalidate = 60;
 
+export const metadata = {
+  title: "Menu",
+  description: "Browse our authentic Ethiopian menu featuring traditional meat dishes, vegetarian options, and classic delicacies.",
+};
+
 async function getDishes() {
   return dishesData;
 }

@@ -12,7 +12,13 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata = {
-  title: "Habesha Restaurant - Addis Eats",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
+  title: {
+    default: "Habesha Restaurant",
+    template: "%s | Habesha Restaurant",
+  },
   description: "Authentic Ethiopian dishes and cuisine",
 };
 
