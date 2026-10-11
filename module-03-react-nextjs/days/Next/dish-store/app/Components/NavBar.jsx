@@ -18,6 +18,9 @@ export default function NavBar() {
       <Link href="/orders" className="hover:text-orange-600 transition-colors">
         Orders
       </Link>
+      <Link href="/dashboard" className="hover:text-orange-600 transition-colors">
+        Dashboard
+      </Link>
       <Link href="/kitchen" className="hover:text-orange-600 transition-colors">
         Kitchen
       </Link>
