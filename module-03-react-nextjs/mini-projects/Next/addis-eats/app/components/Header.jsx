@@ -27,6 +27,9 @@ export default async function Header() {
         <Link href="/orders/mine" className="hover:text-amber-500 transition-colors">
           My Orders
         </Link>
+        <Link href="/dashboard" className="hover:text-amber-500 transition-colors">
+          Dashboard
+        </Link>
         {session?.user?.role === "staff" ? (
           <Link href="/staff" className="text-amber-400 font-semibold hover:text-amber-300 transition-colors">
             Staff Board
