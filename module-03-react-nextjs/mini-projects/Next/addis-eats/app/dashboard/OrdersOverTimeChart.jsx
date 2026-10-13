@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { etb } from "@/lib/format";
 
 export default function OrdersOverTimeChart({
   data = [],
@@ -224,7 +225,7 @@ export default function OrdersOverTimeChart({
                       {row.count}
                     </td>
                     <td className="py-2 px-3 text-right font-mono text-amber-400">
-                      {Number(row.revenue || 0).toLocaleString()} ETB
+                      {etb(row.revenue)}
                     </td>
                     <td className="py-2 px-3 text-right font-mono text-zinc-400">
                       {share}%
@@ -243,7 +244,7 @@ export default function OrdersOverTimeChart({
                   {totalOrders}
                 </td>
                 <td className="py-2 px-3 text-right font-mono text-amber-400 font-extrabold">
-                  {Number(totalRevenue).toLocaleString()} ETB
+                  {etb(totalRevenue)}
                 </td>
                 <td className="py-2 px-3 text-right font-mono text-zinc-200">
                   100.0%

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import Link from "next/link";
+import { etb } from "@/lib/format";
 import { useCart } from "../context/CartContext";
 import { placeOrder } from "../actions/orders";
 
@@ -98,7 +99,7 @@ export default function CheckoutForm() {
 
       <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
         <span className="text-zinc-400">Total</span>
-        <span className="text-2xl font-bold text-amber-500">{total} ETB</span>
+        <span className="text-2xl font-bold text-amber-500">{etb(total)}</span>
       </div>
 
       <button

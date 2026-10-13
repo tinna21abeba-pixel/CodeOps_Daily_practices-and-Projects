@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { etb } from "@/lib/format";
 import AddToCartButton from "./AddToCartButton";
 
 export default function DishList({ dishes = [] }) {
@@ -37,7 +38,7 @@ export default function DishList({ dishes = [] }) {
 
             <div className="mt-auto pt-4 border-t border-zinc-800 flex items-center justify-between">
               <span className="text-amber-500 text-xl font-bold">
-                {dish.price} ETB
+                {etb(dish.price)}
               </span>
             </div>
 
