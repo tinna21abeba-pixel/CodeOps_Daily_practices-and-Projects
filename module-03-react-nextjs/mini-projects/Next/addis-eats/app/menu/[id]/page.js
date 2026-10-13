@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import dishes from "../../data/dishes";
+import { etb } from "@/lib/format";
 import AddToCartButton from "../AddToCartButton";
 
 export async function generateStaticParams() {
@@ -96,7 +97,7 @@ export default async function DishDetails({ params }) {
         </p>
 
         <h2 className="text-3xl font-bold text-amber-500 mb-8">
-          {dish.price} ETB
+          {etb(dish.price)}
         </h2>
 
         <div className="flex gap-4">

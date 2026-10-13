@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { etb } from "@/lib/format";
 import { useCart } from "../context/CartContext";
 
 export default function CartView() {
@@ -38,12 +39,12 @@ export default function CartView() {
             <div>
               <h3 className="font-bold text-white text-base">{item.name}</h3>
               <p className="text-zinc-400 text-xs mt-0.5">
-                {item.price} ETB &times; {item.quantity || 1}
+                {etb(item.price)} &times; {item.quantity || 1}
               </p>
             </div>
             <div className="flex items-center gap-4">
               <span className="font-bold text-amber-500">
-                {item.price * (item.quantity || 1)} ETB
+                {etb(item.price * (item.quantity || 1))}
               </span>
               <button
                 onClick={() => removeItem(item.id)}
@@ -58,7 +59,7 @@ export default function CartView() {
 
       <div className="pt-4 border-t border-zinc-800 flex items-center justify-between">
         <span className="text-zinc-400 font-medium">Total</span>
-        <span className="text-2xl font-bold text-amber-500">{total} ETB</span>
+        <span className="text-2xl font-bold text-amber-500">{etb(total)}</span>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-2">

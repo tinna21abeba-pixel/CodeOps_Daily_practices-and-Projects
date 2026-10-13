@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listOrders } from "../lib/store";
+import { etb } from "@/lib/format";
 import RevenueChart from "./RevenueChart";
 import OrdersOverTimeChart from "./OrdersOverTimeChart";
 import OrderTable from "./OrderTable";
@@ -221,6 +222,13 @@ export default async function DashboardPage({ searchParams }) {
           >
             Page 3 Sorted by Total
           </Link>
+          <a
+            href="/api/orders/export"
+            download="orders.csv"
+            className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-zinc-950 transition"
+          >
+            Export CSV
+          </a>
         </div>
       </div>
 
@@ -230,7 +238,7 @@ export default async function DashboardPage({ searchParams }) {
             Total Revenue
           </span>
           <div className="text-xl sm:text-2xl font-extrabold text-amber-400 font-mono mt-1">
-            {Number(totalRevenue).toLocaleString()} ETB
+            {etb(totalRevenue)}
           </div>
           <span className="text-[11px] text-zinc-500 mt-1 block">
             Aggregated server-side
@@ -254,7 +262,7 @@ export default async function DashboardPage({ searchParams }) {
             Avg. Order Value
           </span>
           <div className="text-xl sm:text-2xl font-extrabold text-emerald-400 font-mono mt-1">
-            {avgOrderValue.toLocaleString()} ETB
+            {etb(avgOrderValue)}
           </div>
           <span className="text-[11px] text-zinc-500 mt-1 block">
             Per customer transaction

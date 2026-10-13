@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { etb, when } from "@/lib/format";
 
 export default function OrderTable({
   orders = [],
@@ -105,14 +106,7 @@ export default function OrderTable({
 
         <tbody className="divide-y divide-zinc-800/60 bg-zinc-900">
           {orders.map((order) => {
-            const dateStr = order.createdAt
-              ? new Date(order.createdAt).toLocaleString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "N/A";
+            const dateStr = order.createdAt ? when(order.createdAt) : "N/A";
 
             const itemsStr = Array.isArray(order.items)
               ? order.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")
@@ -152,7 +146,7 @@ export default function OrderTable({
                   {orderQty}
                 </td>
                 <td className="py-3 px-3.5 text-right font-mono font-bold text-amber-400">
-                  {Number(order.total || 0).toLocaleString()} ETB
+                  {etb(order.total)}
                 </td>
               </tr>
             );
@@ -172,7 +166,7 @@ export default function OrderTable({
               {pageTotalQty}
             </td>
             <td className="py-3 px-3.5 text-right font-mono text-amber-400 font-extrabold text-sm sm:text-base">
-              {Number(pageTotalRevenue).toLocaleString()} ETB
+              {etb(pageTotalRevenue)}
             </td>
           </tr>
         </tfoot>

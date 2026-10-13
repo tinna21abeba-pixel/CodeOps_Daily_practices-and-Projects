@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "../lib/session";
 import { listOrders } from "../lib/store";
+import { etb } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -113,7 +114,7 @@ export default async function StaffPage() {
                     {order.items.map((item, index) => (
                       <li key={index} className="flex justify-between">
                         <span>{item.quantity} x {item.name}</span>
-                        <span>{item.price * item.quantity} ETB</span>
+                        <span>{etb(item.price * item.quantity)}</span>
                       </li>
                     ))}
                   </ul>
@@ -121,7 +122,7 @@ export default async function StaffPage() {
               </div>
               <div className="mt-4 pt-3 border-t border-zinc-800 flex justify-between items-center">
                 <span className="text-xs font-mono text-zinc-500">User: {order.userId}</span>
-                <span className="text-sm font-bold text-amber-500">{order.total} ETB</span>
+                <span className="text-sm font-bold text-amber-500">{etb(order.total)}</span>
               </div>
             </div>
           ))}

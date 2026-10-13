@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "../../lib/session";
 import { listOrdersByUser, toOwnerOrder } from "../../lib/store";
+import { etb, when, relative } from "../../lib/format";
 import CancelOrderButton from "../CancelOrderButton";
 
 export const dynamic = "force-dynamic";
@@ -62,7 +63,7 @@ export default async function MyOrdersPage() {
                       {o.id}
                     </Link>
                     <span className="text-xs text-zinc-500">
-                      {new Date(o.createdAt).toLocaleString()}
+                      {when(o.createdAt)} ({relative(o.createdAt)})
                     </span>
                   </div>
                   <p className="text-zinc-300 text-sm mt-2">
@@ -71,7 +72,7 @@ export default async function MyOrdersPage() {
                   <p className="text-zinc-500 text-xs mt-1">Delivery address: {o.address}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-amber-500 font-bold text-lg">{o.total} ETB</p>
+                  <p className="text-amber-500 font-bold text-lg">{etb(o.total)}</p>
                   <span
                     className={`inline-block text-xs px-2.5 py-0.5 rounded-full font-medium mt-1 ${
                       o.status === "delivered"

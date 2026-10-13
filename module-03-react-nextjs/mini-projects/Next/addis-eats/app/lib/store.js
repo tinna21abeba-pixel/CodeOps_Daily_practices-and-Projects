@@ -23,7 +23,7 @@ globalThis.__addisEatsDb ??= {
       phone: "+251922334455",
       address: "Kazanchis, Addis Ababa",
       neighbourhood: "Kazanchis",
-      note: "Mild spice",
+      note: 'Customer requested "extra spicy" sauce',
       items: [{ dishId: 2, name: "Tibs", price: 280, quantity: 2 }],
       total: 560,
       status: "delivered",
@@ -318,7 +318,15 @@ export const listOrdersByUser = (userId) =>
   db.orders.filter((o) => o.userId === userId);
 
 export function toPublicOrder(o) {
-  return { id: o.id, items: o.items, total: o.total, status: o.status, createdAt: o.createdAt };
+  return {
+    id: o.id,
+    items: o.items,
+    total: o.total,
+    status: o.status,
+    createdAt: o.createdAt,
+    address: o.address,
+    neighbourhood: o.neighbourhood,
+  };
 }
 
 function advance(order) {

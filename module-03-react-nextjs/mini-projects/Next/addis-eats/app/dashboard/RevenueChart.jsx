@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { etb } from "@/lib/format";
 
 export default function RevenueChart({ data = [] }) {
   const [activeItem, setActiveItem] = useState(null);
@@ -38,7 +39,7 @@ export default function RevenueChart({ data = [] }) {
         <div className="text-left sm:text-right">
           <span className="text-xs text-zinc-400 block">Total Revenue</span>
           <span className="text-base font-extrabold text-amber-400 font-mono">
-            {Number(totalRevenue).toLocaleString()} ETB
+            {etb(totalRevenue)}
           </span>
         </div>
       </div>
@@ -86,7 +87,7 @@ export default function RevenueChart({ data = [] }) {
                   fontSize="11"
                   fontFamily="monospace"
                 >
-                  {Math.round(tickVal).toLocaleString()} ETB
+                  {etb(Math.round(tickVal))}
                 </text>
               </g>
             );
@@ -145,7 +146,7 @@ export default function RevenueChart({ data = [] }) {
                   fontWeight="bold"
                   fontFamily="monospace"
                 >
-                  {rev.toLocaleString()} ETB
+                  {etb(rev)}
                 </text>
 
                 <text
@@ -202,7 +203,7 @@ export default function RevenueChart({ data = [] }) {
                       {row.orderCount || 0}
                     </td>
                     <td className="py-2 px-3 text-right font-mono text-amber-400 font-semibold">
-                      {Number(row.revenue || 0).toLocaleString()} ETB
+                      {etb(row.revenue)}
                     </td>
                     <td className="py-2 px-3 text-right font-mono text-zinc-400">
                       {share}%
@@ -221,7 +222,7 @@ export default function RevenueChart({ data = [] }) {
                   {totalOrders}
                 </td>
                 <td className="py-2 px-3 text-right font-mono text-amber-400 font-extrabold">
-                  {Number(totalRevenue).toLocaleString()} ETB
+                  {etb(totalRevenue)}
                 </td>
                 <td className="py-2 px-3 text-right font-mono text-zinc-200">
                   100.0%
