@@ -20,34 +20,34 @@ export async function GET(request, { params }) {
   }
 
   const encoder = new TextEncoder();
+  let timer;
 
   const stream = new ReadableStream({
     start(controller) {
       function sendUpdate() {
-        const order = findOrder(id);
-        if (!order) {
-          controller.close();
+        try {
+          const order = findOrder(id);
+          if (!order) {
+            controller.close();
+            return true;
+          }
+          const data = toPublicOrder(order);
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+          if (order.status === "delivered" || order.status === "cancelled") {
+            controller.close();
+            return true;
+          }
+          return false;
+        } catch {
           return true;
         }
-        const data = toPublicOrder(order);
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-        if (order.status === "delivered" || order.status === "cancelled") {
-          controller.close();
-          return true;
-        }
-        return false;
       }
 
-      const isCompleted = sendUpdate();
-      if (isCompleted) return;
+      if (sendUpdate()) return;
 
-      const timer = setInterval(() => {
-        try {
-          const finished = sendUpdate();
-          if (finished) clearInterval(timer);
-        } catch {
-          clearInterval(timer);
-        }
+      timer = setInterval(() => {
+        const finished = sendUpdate();
+        if (finished) clearInterval(timer);
       }, 3000);
 
       request.signal.addEventListener("abort", () => {
@@ -56,6 +56,9 @@ export async function GET(request, { params }) {
           controller.close();
         } catch {}
       });
+    },
+    cancel() {
+      if (timer) clearInterval(timer);
     },
   });
 
