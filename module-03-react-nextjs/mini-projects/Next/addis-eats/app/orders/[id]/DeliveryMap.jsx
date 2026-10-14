@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 const COORDINATES = {
   Bole: [8.995, 38.785],
@@ -26,6 +27,8 @@ function resolveCoordinates(neighbourhood, address) {
 export default function DeliveryMap({ neighbourhood, address, status }) {
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
+  const courierMarkerRef = useRef(null);
+  const deliveryMarkerRef = useRef(null);
 
   const { coords: deliveryCoords, label: deliveryArea } = resolveCoordinates(
     neighbourhood,
@@ -54,23 +57,18 @@ export default function DeliveryMap({ neighbourhood, address, status }) {
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {
         zoomControl: true,
-        attributionControl: false,
+        attributionControl: true,
       });
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 18,
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
       mapInstanceRef.current = map;
     }
 
     const map = mapInstanceRef.current;
-
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
 
     const courierIcon = L.divIcon({
       className: "marker-courier",
@@ -86,18 +84,20 @@ export default function DeliveryMap({ neighbourhood, address, status }) {
       iconAnchor: [30, 12],
     });
 
-    L.marker(courierCoords, { icon: courierIcon }).addTo(map);
-    L.marker(deliveryCoords, { icon: deliveryIcon }).addTo(map);
+    if (!courierMarkerRef.current) {
+      courierMarkerRef.current = L.marker(courierCoords, { icon: courierIcon }).addTo(map);
+    } else {
+      courierMarkerRef.current.setLatLng(courierCoords);
+    }
+
+    if (!deliveryMarkerRef.current) {
+      deliveryMarkerRef.current = L.marker(deliveryCoords, { icon: deliveryIcon }).addTo(map);
+    } else {
+      deliveryMarkerRef.current.setLatLng(deliveryCoords);
+    }
 
     const bounds = L.latLngBounds([courierCoords, deliveryCoords]);
     map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-
-    return () => {
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
   }, [
     courierCoords[0],
     courierCoords[1],
@@ -105,15 +105,26 @@ export default function DeliveryMap({ neighbourhood, address, status }) {
     deliveryCoords[1],
   ]);
 
+  useEffect(() => {
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+        courierMarkerRef.current = null;
+        deliveryMarkerRef.current = null;
+      }
+    };
+  }, []);
+
   return (
-    <div className="mt-6">
+    <div>
       <div
         ref={mapContainerRef}
-        style={{ height: "300px" }}
-        className="w-full h-[300px] rounded-xl overflow-hidden border border-zinc-800"
+        style={{ height: "380px" }}
+        className="w-full h-[380px] rounded-xl overflow-hidden border border-zinc-800"
       />
 
-      <div className="mt-3 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs space-y-2">
+      <div className="mt-4 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs space-y-2">
         <div className="flex justify-between items-center">
           <span className="font-semibold text-amber-400">Courier Location</span>
           <span className="font-mono text-zinc-300">
@@ -128,7 +139,7 @@ export default function DeliveryMap({ neighbourhood, address, status }) {
         </div>
         <div className="flex justify-between items-center pt-2 border-t border-zinc-800 text-zinc-400">
           <span>Map Viewport</span>
-          <span>Fitted to encompass courier and delivery markers</span>
+          <span>Fitted to courier and delivery markers</span>
         </div>
       </div>
     </div>

@@ -37,12 +37,21 @@ export default async function MyOrdersPage() {
             Account: <span className="font-semibold text-zinc-200">{session.user?.name}</span> (ID: <span className="font-mono">{session.userId}</span>)
           </p>
         </div>
-        <Link
-          href="/menu"
-          className="text-xs font-semibold px-4 py-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 rounded-xl transition font-bold"
-        >
-          Browse Menu
-        </Link>
+        <div className="flex items-center gap-3">
+          <a
+            href="/api/orders/export"
+            download="orders.csv"
+            className="text-xs font-bold px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 rounded-xl transition"
+          >
+            Export Orders CSV
+          </a>
+          <Link
+            href="/menu"
+            className="text-xs font-semibold px-4 py-2 bg-amber-500 hover:bg-amber-600 text-zinc-950 rounded-xl transition font-bold"
+          >
+            Browse Menu
+          </Link>
+        </div>
       </div>
 
       {orders.length === 0 ? (

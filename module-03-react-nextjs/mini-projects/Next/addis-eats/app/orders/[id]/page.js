@@ -59,18 +59,27 @@ export default async function OrderPage({ params }) {
   }
 
   return (
-    <div className="max-w-xl mx-auto px-6 py-12 text-white">
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-zinc-800">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 text-white">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-zinc-800">
         <div>
           <h1 className="text-3xl font-bold text-amber-500">Order {id}</h1>
           <p className="text-xs text-zinc-400 mt-1">Customer: {order.name}</p>
         </div>
-        <Link
-          href="/orders/mine"
-          className="text-xs text-amber-400 hover:text-amber-300 underline font-medium"
-        >
-          Back to My Orders
-        </Link>
+        <div className="flex items-center gap-3">
+          <a
+            href="/api/orders/export"
+            download="orders.csv"
+            className="text-xs font-medium px-3 py-1.5 rounded-lg border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition"
+          >
+            Export History CSV
+          </a>
+          <Link
+            href="/orders/mine"
+            className="text-xs text-amber-400 hover:text-amber-300 underline font-medium"
+          >
+            Back to My Orders
+          </Link>
+        </div>
       </div>
       <OrderStatus id={id} initialOrder={toPublicOrder(order)} />
     </div>
