@@ -24,7 +24,7 @@ export default function CategoryBar({ selectedCategory: propCategory }) {
           <Link
             key={category}
             href={`/menu?category=${category}`}
-            className={`px-3.5 py-2 rounded-lg text-sm font-medium capitalize text-left transition-all cursor-pointer ${
+            className={`min-h-[44px] min-w-[44px] px-4 py-2.5 inline-flex items-center rounded-lg text-sm font-medium capitalize text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 ${
               selectedCategory === category
                 ? "bg-orange-500 text-white shadow-sm"
                 : "bg-stone-100 hover:bg-stone-200 text-stone-700"

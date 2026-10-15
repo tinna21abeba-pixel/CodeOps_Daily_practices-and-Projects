@@ -6,6 +6,7 @@ import {
   addOrder,
   findOrder,
   cancelOrderById,
+  getOrders,
 } from "@/app/lib/orders";
 import { getSession } from "@/app/lib/session";
 
@@ -37,11 +38,29 @@ export async function createOrder(prevState, formData) {
     };
   }
 
+  const now = Date.now();
+  const recentOrders = getOrders();
+  const duplicate = recentOrders.find((existing) => {
+    const isSameUser = existing.userId === session.user.id;
+    const isSameFood = existing.food === result.data.food;
+    const isSameQuantity = Number(existing.quantity) === Number(result.data.quantity);
+    const isSameCustomer = existing.customerName === result.data.customerName;
+    const createdTime = new Date(existing.createdAt).getTime();
+    return isSameUser && isSameFood && isSameQuantity && isSameCustomer && Math.abs(now - createdTime) < 3000;
+  });
+
+  if (duplicate) {
+    return {
+      fieldErrors: {},
+      message: "Order placed successfully.",
+    };
+  }
+
   const order = {
-    id: Date.now(),
+    id: now,
     userId: session.user.id,
     status: "Pending",
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(now).toISOString(),
     ...result.data,
   };
 
@@ -49,10 +68,11 @@ export async function createOrder(prevState, formData) {
 
   revalidatePath("/checkout");
   revalidatePath("/orders");
+  revalidatePath("/dashboard");
 
   return {
     fieldErrors: {},
-    message: "Order created successfully!",
+    message: "Order placed successfully.",
   };
 }
 
@@ -86,6 +106,7 @@ export async function cancelOrder(orderId) {
 
   revalidatePath("/checkout");
   revalidatePath("/orders");
+  revalidatePath("/dashboard");
 
   return {
     success: true,

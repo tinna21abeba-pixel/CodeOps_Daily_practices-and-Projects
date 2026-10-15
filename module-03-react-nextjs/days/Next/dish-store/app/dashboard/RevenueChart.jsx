@@ -11,10 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-/**
- * Exercise 2:
- * Build the revenue bar chart with a fixed-height container and ETB tick formatting.
- */
 export default function RevenueChart({ data }) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -22,7 +18,6 @@ export default function RevenueChart({ data }) {
     setIsMounted(true);
   }, []);
 
-  // Format ETB currency ticks and values
   const formatETB = (val) => `${Number(val).toLocaleString()} ETB`;
 
   const totalRevenue = data?.reduce((sum, item) => sum + (item.revenue || 0), 0) || 0;
@@ -31,12 +26,9 @@ export default function RevenueChart({ data }) {
     <section className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-            <h2 className="text-base sm:text-lg font-bold text-stone-900">
-              Revenue by Neighbourhood
-            </h2>
-          </div>
+          <h2 className="text-base sm:text-lg font-bold text-stone-900">
+            Revenue by Neighbourhood
+          </h2>
           <p className="text-xs text-stone-500 mt-0.5">
             Total sales aggregated across delivery zones in Addis Ababa
           </p>
@@ -49,7 +41,6 @@ export default function RevenueChart({ data }) {
         </div>
       </div>
 
-      {/* Fixed-height container (height: 320px) to prevent layout shifts */}
       <div style={{ width: "100%", height: 320 }} className="w-full">
         {isMounted ? (
           <ResponsiveContainer width="100%" height="100%">
@@ -66,7 +57,6 @@ export default function RevenueChart({ data }) {
                 tick={{ fill: "#64748b", fontSize: 12, fontWeight: 500 }}
               />
 
-              {/* Requirement 2: ETB tick formatting on Y-Axis */}
               <YAxis
                 tickFormatter={formatETB}
                 tickLine={false}

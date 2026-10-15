@@ -28,10 +28,10 @@ export default async function SinglePage({ params }) {
 
       <Link
         href="/menu"
-        className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+        className="min-h-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
       >
         Back to Menu
       </Link>
     </div>
   );
-}
+}
