@@ -44,7 +44,7 @@ export default async function DishList({ dishes: propDishes, selectedCategory })
               </p>
             </div>
 
-            <div className="pt-3 border-t border-stone-100 flex items-center justify-between mt-auto">
+            <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-2 mt-auto flex-wrap">
               <span className="text-base font-bold text-orange-600">
                 {dish.price}{" "}
                 <span className="text-xs font-normal text-stone-500">
@@ -52,13 +52,15 @@ export default async function DishList({ dishes: propDishes, selectedCategory })
                 </span>
               </span>
 
-              <Link
-                href={`/menu/${dish.id}`}
-                className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg"
-              >
-                View Details
-              </Link>
-              <AddToCartButton dish={dish}/>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/menu/${dish.id}`}
+                  className="min-h-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 transition-colors"
+                >
+                  View Details
+                </Link>
+                <AddToCartButton dish={dish} />
+              </div>
             </div>
           </article>
         ))}

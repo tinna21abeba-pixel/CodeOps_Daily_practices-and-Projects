@@ -32,7 +32,7 @@ export default function Home() {
 
         <Link
           href="/menu"
-          className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm transition-colors cursor-pointer"
+          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
         >
           Explore Our Menu
         </Link>

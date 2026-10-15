@@ -22,6 +22,13 @@ export default function OrderSearch() {
     setPage(1);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setTerm("");
+      setDebouncedTerm("");
+    }
+  };
+
   const { data, error, isLoading, isValidating } = useSWR(
     debouncedTerm
       ? `/api/orders?search=${encodeURIComponent(
@@ -42,8 +49,9 @@ export default function OrderSearch() {
         type="text"
         value={term}
         onChange={handleTermChange}
-        placeholder="Search by customer name..."
-        className="w-full px-4 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-6 bg-white text-stone-900 placeholder-stone-400"
+        onKeyDown={handleKeyDown}
+        placeholder="Search by customer name"
+        className="w-full min-h-[44px] px-4 py-2.5 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-orange-500 mb-6 bg-white text-stone-900 placeholder-stone-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
       />
 
       {error && <p className="text-red-500 text-sm mb-4">Failed to load orders.</p>}
@@ -71,9 +79,10 @@ export default function OrderSearch() {
       {data && data.orders && data.orders.length > 0 && (
         <div className="flex items-center gap-4">
           <button
+            type="button"
             onClick={() => setPage((current) => current - 1)}
             disabled={page === 1}
-            className="px-4 py-2 bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="min-h-[44px] min-w-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -81,9 +90,10 @@ export default function OrderSearch() {
           <span className="text-sm font-medium text-stone-700">Page {page}</span>
 
           <button
+            type="button"
             onClick={() => setPage((current) => current + 1)}
             disabled={!data.hasNextPage}
-            className="px-4 py-2 bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 rounded-lg text-sm font-medium transition-colors cursor-pointer disabled:cursor-not-allowed"
+            className="min-h-[44px] min-w-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-stone-200 hover:bg-stone-300 disabled:opacity-40 text-stone-700 rounded-lg text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600 disabled:cursor-not-allowed"
           >
             Next
           </button>

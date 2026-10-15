@@ -1,19 +1,11 @@
 import Link from "next/link";
 
-/**
- * Exercise 5:
- * Build the order table with real markup, right-aligned totals and a caption.
- *
- * Exercise 6:
- * Add sorting via searchParams, with aria-sort on the active column header.
- */
 export default function OrderTable({
   orders = [],
   currentSort = "date",
   currentDir = "desc",
   currentParams = {},
 }) {
-  // Helper to construct sorting link preserving searchParams
   const getSortHref = (columnKey) => {
     const params = new URLSearchParams();
     Object.entries(currentParams).forEach(([k, v]) => {
@@ -22,24 +14,21 @@ export default function OrderTable({
       }
     });
 
-    // If currently sorted by this column, flip direction; otherwise default
     const isCurrent = currentSort === columnKey;
     const nextDir = isCurrent && currentDir === "asc" ? "desc" : "asc";
 
     params.set("sort", columnKey);
     params.set("dir", nextDir);
-    params.set("page", "1"); // reset to page 1 on new sort
+    params.set("page", "1");
 
     return `/dashboard?${params.toString()}`;
   };
 
-  // Helper for aria-sort on <th>
   const getAriaSort = (columnKey) => {
     if (currentSort !== columnKey) return "none";
     return currentDir === "asc" ? "ascending" : "descending";
   };
 
-  // Status badge styling helper
   const getStatusBadge = (status) => {
     switch (status) {
       case "Delivered":
@@ -57,11 +46,9 @@ export default function OrderTable({
     }
   };
 
-  // Calculate page totals for right-aligned totals in tfoot
   const pageTotalQty = orders.reduce((sum, o) => sum + (o.quantity || 0), 0);
   const pageTotalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
 
-  // Column definitions for sorting and right alignment
   const columns = [
     { key: "id", label: "Order ID", align: "left" },
     { key: "date", label: "Date / Time", align: "left" },
@@ -69,17 +56,15 @@ export default function OrderTable({
     { key: "food", label: "Dish Item", align: "left" },
     { key: "area", label: "Neighbourhood", align: "left" },
     { key: "status", label: "Status", align: "left" },
-    { key: "quantity", label: "Quantity", align: "right" }, // right-aligned
-    { key: "total", label: "Total (ETB)", align: "right" }, // right-aligned
+    { key: "quantity", label: "Quantity", align: "right" },
+    { key: "total", label: "Total (ETB)", align: "right" },
   ];
 
   return (
     <div className="overflow-x-auto">
-      {/* Exercise 5: Real markup with <table>, <caption>, <thead>, <tbody>, <tfoot> */}
       <table className="w-full text-left text-xs sm:text-sm border-collapse">
-        {/* Requirement 5: Caption element */}
         <caption className="caption-top text-left text-xs font-semibold uppercase tracking-wider text-stone-500 mb-3">
-          Customer Orders Log — Listing recent orders with delivery area, status, right-aligned totals, and searchParams sorting
+          Customer Orders Log Listing recent orders with delivery area, status, right-aligned totals, and searchParams sorting
         </caption>
 
         <thead>
@@ -93,14 +78,13 @@ export default function OrderTable({
                   key={col.key}
                   scope="col"
                   aria-sort={ariaSort}
-                  className={`py-3 px-3.5 font-semibold select-none ${
+                  className={`p-1 select-none ${
                     col.align === "right" ? "text-right" : "text-left"
                   }`}
                 >
-                  {/* Exercise 6: Sorting via searchParams with aria-sort */}
                   <Link
                     href={getSortHref(col.key)}
-                    className={`inline-flex items-center gap-1.5 hover:text-orange-600 transition-colors ${
+                    className={`min-h-[44px] px-3 py-2 inline-flex items-center gap-1.5 hover:text-orange-600 transition-colors rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 ${
                       isActive ? "text-orange-600 font-bold" : "text-stone-700"
                     }`}
                     title={`Sort by ${col.label} ${
@@ -112,12 +96,11 @@ export default function OrderTable({
                     }`}
                   >
                     <span>{col.label}</span>
-                    <span
-                      aria-hidden="true"
-                      className="text-[11px] font-mono text-stone-400"
-                    >
-                      {isActive ? (currentDir === "asc" ? "▲" : "▼") : "↕"}
-                    </span>
+                    {isActive ? (
+                      <span className="text-[10px] font-mono uppercase text-orange-600">
+                        [{currentDir}]
+                      </span>
+                    ) : null}
                   </Link>
                 </th>
               );
@@ -152,10 +135,7 @@ export default function OrderTable({
                   {order.food}
                 </td>
                 <td className="py-3 px-3.5 text-stone-600">
-                  <span className="inline-flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-stone-400"></span>
-                    {order.deliveryArea || order.area}
-                  </span>
+                  {order.deliveryArea || order.area}
                 </td>
                 <td className="py-3 px-3.5">
                   <span
@@ -166,13 +146,9 @@ export default function OrderTable({
                     {order.status}
                   </span>
                 </td>
-
-                {/* Requirement 5: Right-aligned quantity */}
                 <td className="py-3 px-3.5 text-right font-mono text-stone-700">
                   {order.quantity}
                 </td>
-
-                {/* Requirement 5: Right-aligned totals with ETB */}
                 <td className="py-3 px-3.5 text-right font-mono font-bold text-stone-900">
                   {Number(order.total || 0).toLocaleString()} ETB
                 </td>
@@ -181,7 +157,6 @@ export default function OrderTable({
           })}
         </tbody>
 
-        {/* Real Markup <tfoot> with right-aligned totals */}
         <tfoot>
           <tr className="border-t-2 border-stone-300 bg-stone-50 font-bold text-stone-900">
             <th
@@ -191,11 +166,9 @@ export default function OrderTable({
             >
               Page Subtotal ({orders.length} orders on this page)
             </th>
-            {/* Right-aligned total quantity */}
             <td className="py-3 px-3.5 text-right font-mono text-stone-800">
               {pageTotalQty}
             </td>
-            {/* Right-aligned total revenue */}
             <td className="py-3 px-3.5 text-right font-mono text-orange-600 font-extrabold text-sm sm:text-base">
               {Number(pageTotalRevenue).toLocaleString()} ETB
             </td>

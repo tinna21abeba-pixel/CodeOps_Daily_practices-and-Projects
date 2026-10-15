@@ -1,5 +1,6 @@
 import { getSession } from "@/app/lib/session";
 import { signIn, signOut } from "@/app/actions/auth";
+import { AccountSubmitButton, SignOutButton } from "./SignInButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -32,12 +33,7 @@ export default async function SignInPage({ searchParams }) {
               ID: <span className="font-mono">{session.user.id}</span> | Role: <span className="font-mono font-semibold uppercase">{session.user.role}</span>
             </p>
             <form action={signOut}>
-              <button
-                type="submit"
-                className="w-full py-2 px-4 bg-stone-200 hover:bg-stone-300 text-stone-800 text-sm font-medium rounded-lg transition-colors cursor-pointer"
-              >
-                Sign Out
-              </button>
+              <SignOutButton />
             </form>
           </div>
         ) : null}
@@ -50,46 +46,19 @@ export default async function SignInPage({ searchParams }) {
           <form action={signIn} className="space-y-3">
             <input type="hidden" name="next" value={nextDestination} />
             <input type="hidden" name="accountId" value="user-1" />
-            <button
-              type="submit"
-              className="w-full text-left p-3.5 border border-stone-200 hover:border-orange-400 hover:bg-orange-50/40 rounded-xl transition-all flex items-center justify-between cursor-pointer"
-            >
-              <div>
-                <p className="text-sm font-semibold text-stone-900">Tehesh</p>
-                <p className="text-xs text-stone-500">ID: user-1 | Role: customer</p>
-              </div>
-              <span className="text-xs font-semibold text-orange-600">Sign in</span>
-            </button>
+            <AccountSubmitButton name="Tehesh" id="user-1" role="customer" />
           </form>
 
           <form action={signIn} className="space-y-3">
             <input type="hidden" name="next" value={nextDestination} />
             <input type="hidden" name="accountId" value="user-2" />
-            <button
-              type="submit"
-              className="w-full text-left p-3.5 border border-stone-200 hover:border-orange-400 hover:bg-orange-50/40 rounded-xl transition-all flex items-center justify-between cursor-pointer"
-            >
-              <div>
-                <p className="text-sm font-semibold text-stone-900">Abebe</p>
-                <p className="text-xs text-stone-500">ID: user-2 | Role: customer</p>
-              </div>
-              <span className="text-xs font-semibold text-orange-600">Sign in</span>
-            </button>
+            <AccountSubmitButton name="Abebe" id="user-2" role="customer" />
           </form>
 
           <form action={signIn} className="space-y-3">
             <input type="hidden" name="next" value={nextDestination} />
             <input type="hidden" name="accountId" value="staff-1" />
-            <button
-              type="submit"
-              className="w-full text-left p-3.5 border border-stone-200 hover:border-orange-400 hover:bg-orange-50/40 rounded-xl transition-all flex items-center justify-between cursor-pointer"
-            >
-              <div>
-                <p className="text-sm font-semibold text-stone-900">Chef Sara</p>
-                <p className="text-xs text-stone-500">ID: staff-1 | Role: staff</p>
-              </div>
-              <span className="text-xs font-semibold text-orange-600">Sign in</span>
-            </button>
+            <AccountSubmitButton name="Chef Sara" id="staff-1" role="staff" />
           </form>
         </div>
       </div>

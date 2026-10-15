@@ -13,7 +13,7 @@ export default function CartView() {
         <h2 className="text-xl font-bold text-stone-700 mb-2">Your cart is empty</h2>
         <Link
           href="/menu"
-          className="inline-block mt-4 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer"
+          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center mt-4 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
         >
           Back to Menu
         </Link>
@@ -37,8 +37,9 @@ export default function CartView() {
                 {(item.price * item.quantity).toFixed(2)} ETB
               </span>
               <button
+                type="button"
                 onClick={() => remove(item.id)}
-                className="text-xs text-red-600 hover:text-red-700 font-medium cursor-pointer"
+                className="min-h-[44px] min-w-[44px] px-3 py-2 inline-flex items-center justify-center text-xs text-red-600 hover:text-red-700 font-medium rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 transition-colors"
               >
                 Remove
               </button>
@@ -52,16 +53,17 @@ export default function CartView() {
         <span className="text-xl font-bold text-orange-600">{total} ETB</span>
       </div>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <button
+          type="button"
           onClick={clear}
-          className="px-4 py-2 bg-stone-200 hover:bg-stone-300 text-stone-700 text-sm font-medium rounded-lg transition-colors cursor-pointer"
+          className="min-h-[44px] min-w-[44px] px-4 py-2.5 inline-flex items-center justify-center bg-stone-200 hover:bg-stone-300 text-stone-700 text-sm font-medium rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500"
         >
           Clear Cart
         </button>
         <Link
-          href="/checkOut"
-          className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors cursor-pointer"
+          href="/checkout"
+          className="min-h-[44px] min-w-[44px] px-6 py-2.5 inline-flex items-center justify-center bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
         >
           Proceed to Checkout
         </Link>

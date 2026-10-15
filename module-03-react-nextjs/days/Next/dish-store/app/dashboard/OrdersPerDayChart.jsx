@@ -11,13 +11,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-/**
- * Exercise 3:
- * Add an orders-per-day line chart with a heading naming the range and the unit.
- *
- * Exercise 4:
- * Put the same chart data in a table beneath it for anyone who cannot see the SVG.
- */
 export default function OrdersPerDayChart({
   data = [],
   range = "Oct 1 to Oct 7, 2026",
@@ -30,23 +23,25 @@ export default function OrdersPerDayChart({
     setIsMounted(true);
   }, []);
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape" && showTable) {
+      setShowTable(false);
+    }
+  };
+
   const totalOrders = data.reduce((sum, item) => sum + (item.count || 0), 0);
   const totalRevenue = data.reduce((sum, item) => sum + (item.revenue || 0), 0);
 
   return (
-    <section className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between">
-      {/* Exercise 3: Heading explicitly naming the range and the unit */}
+    <section className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200 shadow-sm flex flex-col justify-between" onKeyDown={handleKeyDown}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-            <h2
-              id="orders-per-day-title"
-              className="text-base sm:text-lg font-bold text-stone-900"
-            >
-              Orders Per Day — {range} ({unit})
-            </h2>
-          </div>
+          <h2
+            id="orders-per-day-title"
+            className="text-base sm:text-lg font-bold text-stone-900"
+          >
+            Orders Per Day — {range} ({unit})
+          </h2>
           <p className="text-xs text-stone-500 mt-0.5">
             Daily order volume timeline and trend analysis
           </p>
@@ -65,7 +60,7 @@ export default function OrdersPerDayChart({
             onClick={() => setShowTable((prev) => !prev)}
             aria-expanded={showTable}
             aria-controls="orders-per-day-accessible-table"
-            className="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors cursor-pointer"
+            className="min-h-[44px] text-xs font-semibold px-4 py-2.5 rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-700 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600 inline-flex items-center justify-center"
             title="Toggle accessible tabular data"
           >
             {showTable ? "Hide Data Table" : "Show Data Table"}
@@ -73,7 +68,6 @@ export default function OrdersPerDayChart({
         </div>
       </div>
 
-      {/* Fixed-height container (320px) for SVG Line Chart */}
       <div
         style={{ width: "100%", height: 320 }}
         className="w-full"
@@ -133,7 +127,6 @@ export default function OrdersPerDayChart({
         )}
       </div>
 
-      {/* Exercise 4: Put the same chart data in a table beneath it for anyone who cannot see the SVG */}
       {showTable && (
         <div
           id="orders-per-day-accessible-table"
@@ -215,7 +208,7 @@ export default function OrdersPerDayChart({
             </table>
           </div>
           <p className="text-[11px] text-stone-400 mt-2">
-            * This table provides a complete semantic, accessible alternative to the SVG line chart.
+            This table provides a complete semantic accessible alternative to the SVG line chart.
           </p>
         </div>
       )}

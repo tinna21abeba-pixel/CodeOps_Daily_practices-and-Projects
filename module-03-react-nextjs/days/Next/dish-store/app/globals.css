@@ -17,3 +17,16 @@ body {
   color: var(--foreground);
   font-family: var(--font-plus-jakarta), sans-serif;
 }
+
+:focus-visible {
+  outline: 2px solid #ea580c;
+  outline-offset: 2px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}

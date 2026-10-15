@@ -1,6 +1,9 @@
-/** @type {import('next').NextConfig} */
+import path from "node:path";
+
 const nextConfig = {
-  /* config options here */
+  turbopack: {
+    root: path.resolve("."),
+  },
 };
 
 export default nextConfig;
