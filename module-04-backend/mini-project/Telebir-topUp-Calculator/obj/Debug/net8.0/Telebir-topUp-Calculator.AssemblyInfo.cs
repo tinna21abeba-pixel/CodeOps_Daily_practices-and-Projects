@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Telebir-topUp-Calculator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0da97410b58a81595b1dac999eea8f151de49797")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a54380480a75c80878ac6069bdb4934c3a00103b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Telebir-topUp-Calculator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Telebir-topUp-Calculator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
