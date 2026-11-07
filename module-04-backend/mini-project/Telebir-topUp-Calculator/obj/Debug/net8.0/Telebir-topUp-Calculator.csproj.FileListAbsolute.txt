@@ -1,0 +1,15 @@
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Telebir-topUp-Calculator
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Telebir-topUp-Calculator.deps.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Telebir-topUp-Calculator.runtimeconfig.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Telebir-topUp-Calculator.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Telebir-topUp-Calculator.pdb
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.GeneratedMSBuildEditorConfig.editorconfig
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.AssemblyInfoInputs.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.AssemblyInfo.cs
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.csproj.CoreCompileInputs.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.sourcelink.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/refint/Telebir-topUp-Calculator.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.pdb
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.genruntimeconfig.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/ref/Telebir-topUp-Calculator.dll
