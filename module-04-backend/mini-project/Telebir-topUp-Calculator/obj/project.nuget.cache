@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "FDJChKuAQbDZHs3m2fh9WHgN2ITYIK9DkOE0/zBqADUYWIAOp/ptBIykNBMQ6sWPlVTmwMcmLoaR0JtW5UoL8A==",
+  "dgSpecHash": "Lhc6fziNBb25w5wPY0Ajf2h8e23JhszEvtyTwxJINHD8a4u9cOuFjGQQqTujEooTHnSkiAA9d3dO0YRWmUS63g==",
   "success": true,
   "projectFilePath": "/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/Telebir-topUp-Calculator.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/thesh/.nuget/packages/spectre.console/0.57.2/spectre.console.0.57.2.nupkg.sha512",
+    "/home/thesh/.nuget/packages/spectre.console.ansi/0.57.2/spectre.console.ansi.0.57.2.nupkg.sha512"
+  ],
   "logs": []
 }

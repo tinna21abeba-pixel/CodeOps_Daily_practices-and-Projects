@@ -1,44 +1,48 @@
-﻿
-Console.Write("Enter Customer name:  ");
+﻿using Spectre.Console;
+
+
+Console.Write("enter your name: ");
 string name = Console.ReadLine() ?? "";
 
-Console.Write("Enter mobile network: ");
+Console.Write("enter your prefered network: ");
 string network = Console.ReadLine() ?? "";
 
-Console.Write("Enter topUp amount (ETB):  ");
-string input = Console.ReadLine() ?? "";
+Console.Write("enter the amount (ETB): ");
+string amount = Console.ReadLine() ?? "";
 
-if (!Decimal.TryParse(input, out Decimal amount) || amount <= 0 || amount > 5000)
+if (!Decimal.TryParse(amount, out Decimal input) || input <= 0 || input > 5000)
 {
-    Console.WriteLine("Invalid amount! enter an amount between 0 and 5000 ETB");
-    return;
-};
-
+  Console.WriteLine("enter a valid number between 0 and 5000");
+  return;
+}
 
 decimal bonusRate = network.Trim().ToLower() switch
 {
-    "ethio telecom" => 0.05m,
-    "safaricom" => 0.03m,
-    _ => 0.00m
-
-
+  "ethio telecom" => 0.03m,
+  "safaricom" => 0.05m,
+  _ => 0.00m
 };
 
-Decimal bonus= amount * bonusRate;
-Decimal extraCredit=amount >=1000 ?20m :0m;
-decimal finalCredit=amount + bonus + extraCredit;
+decimal bonus = input * bonusRate;
 
-Console.WriteLine("\n========== TOP-UP RECEIPT ==========");
+decimal extraBonus = input >= 1000 ? 20m : 0m;
+decimal totalAmount = input + bonus + extraBonus;
+AnsiConsole.Write(
+    new Rule("[bold cyan]ETHIO TOP-UP SERVICES[/]")
+        .RuleStyle(Color.Cyan)
+);
+Console.WriteLine($"{"Customer",-12} {name}");
+Console.WriteLine($"{"network",-12} {network}");
+Console.WriteLine($"{"Bonus",-12} {bonus,12:N2} ETB");
+Console.WriteLine($"{"amount",-12} {input,12:N2} ETB");
+Console.WriteLine($"{"finalCrredit",-12} {totalAmount,12:N2} ETB");
 
-Console.WriteLine($"{"Customer",12}: {name}");
-Console.WriteLine($"{"Network",-20}: {network}");
-Console.WriteLine($"{"Amount",-20}: {amount,12:N2} ETB");
-Console.WriteLine($"{"Bonus",-20}: {bonus,12:N2} ETB");
-Console.WriteLine($"{"Extra Credit",-20}: {extraCredit,12:N2} ETB");
+AnsiConsole.MarkupLine(
+    "\n[italic cyan]Thank you for using Ethio Top-Up![/]"
+);
 
-Console.WriteLine("------------------------------------");
+AnsiConsole.MarkupLine(
+    "[italic green]Have a great day![/]"
+);
 
-Console.WriteLine($"{"Final Credit",-20}: {finalCredit,12:N2} ETB");
-
-Console.WriteLine("====================================");
 

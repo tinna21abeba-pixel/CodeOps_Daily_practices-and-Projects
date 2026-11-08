@@ -13,3 +13,7 @@
 /home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.pdb
 /home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.genruntimeconfig.cache
 /home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/ref/Telebir-topUp-Calculator.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Spectre.Console.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/bin/Debug/net8.0/Spectre.Console.Ansi.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.csproj.AssemblyReference.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Telebir-topUp-Calculator/obj/Debug/net8.0/Telebir-topUp-Calculator.csproj.CopyComplete
