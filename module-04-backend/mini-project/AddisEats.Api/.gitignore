@@ -1,0 +1,13 @@
+# .NET generated files
+bin/
+obj/
+
+# User-specific files
+.vs/
+*.user
+*.suo
+
+# Environment variables
+.env
+.env.*
+!.env.example
