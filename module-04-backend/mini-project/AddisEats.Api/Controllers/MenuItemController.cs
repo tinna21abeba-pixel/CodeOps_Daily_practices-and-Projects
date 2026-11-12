@@ -16,9 +16,9 @@ public class MenuItemController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAll([fromQuery] string ? Category)
+    public IActionResult GetAll([FromQuery] string ? Category)
     {
-        var result = _menuItemService.GetAll();
+        var result = _menuItemService.GetAll(Category);
 
         return Ok(result);
     }
