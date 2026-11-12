@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AddisEats.Api.Models;
 using System.Data.Common;
+using AddisEats.Api.Services.MenuItemServices;
 
 namespace AddisEats.Api.Controllers;
 
@@ -10,27 +11,27 @@ namespace AddisEats.Api.Controllers;
 [Route("api/v1/[controller]")]
 public class MenuItemController : ControllerBase
 {
-    private List<MenuItem> menuItems = new List<MenuItem>
-    {
-        new MenuItem { Id = 1, Name = "Cheeseburger", Category = "Main Course" },
-        new MenuItem { Id = 2, Name = "Doro Wot", Category = "Main Course" },
-        new MenuItem { Id = 3, Name = "Shiro", Category = "Main Course" }
-    };
 
-    [HttpGet("abe")]
+ private readonly IMenuItemService _menuItemService;
+  public MenuItemController(IMenuItemService menuItemService)
+    {
+        _menuItemService= menuItemService;
+    }
+    [HttpGet("addisEats")]
     public IActionResult GetAll()
     {
-        return Ok(menuItems);
+        var result= _menuItemService.GetAll();
+        return Ok(result);
     }
     
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
-        var menuItem=menuItems.FirstOrDefault(m=>m.Id==id);
-        if(menuItem == null)
+        var result= _menuItemService.GetById(); 
+        if(result == null)
         {
             return NotFound();
         }
-        return Ok(menuItem);
+        return Ok(result);
     }
 }
