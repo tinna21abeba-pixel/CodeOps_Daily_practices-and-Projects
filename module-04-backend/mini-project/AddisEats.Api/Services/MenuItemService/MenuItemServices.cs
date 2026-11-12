@@ -34,9 +34,11 @@ public class MenuItemService : IMenuItemService
         }
     };
 
-    public List<MenuItem> GetAll()
+    public List<MenuItem> GetAll( string ? category)
     {
-        return _menuItems;
+        var items=_menuItems
+        .Where(x=> category ==null || x.Category == category).ToList();
+        return(items);
     }
 
     public MenuItem? GetById(int id)
