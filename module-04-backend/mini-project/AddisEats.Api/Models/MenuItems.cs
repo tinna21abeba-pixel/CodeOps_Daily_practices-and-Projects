@@ -3,11 +3,12 @@ namespace AddisEats.Api.Models;
 public class MenuItem
 {
     public int Id { get; set; }
-    public String Name { get; set; }
-    public String Category{ get; set; }
 
-    public decimal PRice { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public decimal PriceWithVat{ get; set; }
-    
+    public string Category { get; set; } = string.Empty;
+
+    public decimal Price { get; set; }
+
+    public decimal PriceWithVat { get; set; }
 }
