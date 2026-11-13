@@ -1,5 +1,6 @@
 using AddisEats.Api.MenuItemServices;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Register services
@@ -11,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
 
+
+var thePhoneNumber=builder.Configuration.GetValue<string>("data:contact:phone");
+Console.WriteLine(thePhoneNumber);
 var app = builder.Build();
 
 // Configure HTTP request pipeline
