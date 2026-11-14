@@ -7,4 +7,5 @@ public class Resturant
       public  string Address{get; set;}
        public string Phone {get; set;}
         public  bool IsAcitve{get; set;}
+        public string OwnerAddress{get; set;}
 }
