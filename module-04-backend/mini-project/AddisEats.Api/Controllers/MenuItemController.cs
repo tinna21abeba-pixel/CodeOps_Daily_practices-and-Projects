@@ -5,7 +5,7 @@ using AddisEats.Api.MenuItemServices;
 namespace AddisEats.Api.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")]
+[Route("api/v1/health")]
 public class MenuItemController : ControllerBase
 {
     private readonly IMenuItemService _menuItemService;
