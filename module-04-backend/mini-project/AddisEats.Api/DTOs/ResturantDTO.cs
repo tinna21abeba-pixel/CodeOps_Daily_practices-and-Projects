@@ -1,7 +1,7 @@
 namespace AddiseEats.Api.DTOs;
 
 
-public record Restuarant
+public record Restuarant 
 (
      int Id,
     string Name,
