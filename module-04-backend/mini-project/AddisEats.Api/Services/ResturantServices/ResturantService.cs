@@ -7,7 +7,7 @@ namespace AddisEats.Api.Servicess.RestauranService;
 public class RestaurantService :IRestaurantService
 {
     private readonly List<Restuarant>  allRestuarants=SeedData.Restuarants;
-    {
+    
  
       public Restuarant?  GetBYId(int id)
     {
@@ -16,7 +16,7 @@ public class RestaurantService :IRestaurantService
 
     public List<Restuarant> GetAll( string ? address, int page, int pageSize)
     {
-        var restuarants=allRestuarants.Where(r=>AddisEats == null || r.Address ==address)
+        var restuarants=allRestuarants.Where(r=>address == null || r.Address ==address)
         .orderBy(r=>r.Name)
         .Skip((page-1) *pageSize)
         .Take(pageSize)
@@ -25,4 +25,4 @@ public class RestaurantService :IRestaurantService
     }
  
     }
-    }
+    
