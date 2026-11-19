@@ -1,17 +1,25 @@
 using AddisEats.Api.Models;
-using AddisEats.Api.Data;
 
+namespace AddisEats.Api.ResturantServices;
 
-namespace AddisEats.Api.Servicess.RestauranService;
+public interface IResturantService
+{
+    Resturant? GetById(int id);
+    Resturant? GetRestuarantById(int id) => GetById(id);
 
+    List<Resturant> GetAll(
+        string? address,
+        int page,
+        int pageSize
+    );
 
+    List<Resturant> GetAll(
+        string? address,
+        int? page,
+        int? pageSize
+    ) => GetAll(address, page ?? 1, pageSize ?? 10);
+}
 
-public interface IRestuarantService
-{  
-    Restuarant ?GetById(int id);
-    List<Restuarant> GetAll( string ? address, int page, int pageSize);
-    
-
-
-   
+public interface IRestuarantService : IResturantService
+{
 }

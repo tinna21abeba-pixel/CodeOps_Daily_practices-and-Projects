@@ -1,5 +1,5 @@
 using AddisEats.Api.MenuItemServices;
-using AddisEats.Api.RestuarantService;
+using AddisEats.Api.ResturantServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IMenuItemService, MenuItemService>();
-builder.Services.AddScoped<IRestuarantService, RestuarantService>();
+builder.Services.AddScoped<IResturantService, ResturantService>();
+builder.Services.AddScoped<IRestuarantService, ResturantService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

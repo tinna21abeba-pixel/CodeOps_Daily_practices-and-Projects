@@ -1,27 +1,23 @@
-using  AddisEats.Api.Models;
+using AddisEats.Api.Models;
 using AddisEats.Api.DTOs;
 
 namespace AddisEats.Api.Mappers;
 
-public static class RestuarantMapper
+public static class ResturantMapper
 {
-    public static decimal Add(decimal x, decimal y)
+    public static ResturantDTO ToDTO(this Resturant resturant)
     {
-        return x +y;
-    }
-    public static RestuarantDTO ToDTO(this Resturant restuarant) 
-    {
-        return new RestuarantDTO (
-            restuarant.Id,
-            restuarant.Name,
-            restuarant.Address,
-            resturaant.Phone,
-            restuarant.IsAcitve
-
-
+        return new ResturantDTO(
+            resturant.Id,
+            resturant.Name,
+            resturant.Address,
+            resturant.Phone,
+            resturant.IsAcitve
         );
     }
-    
-};
 
-RestuarantDTO x=restuarant.ToDTO();
+    public static ResturantDTO ToDTOs(this Resturant resturant)
+    {
+        return resturant.ToDTO();
+    }
+}
