@@ -1,0 +1,30 @@
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.GeneratedMSBuildEditorConfig.editorconfig
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.AssemblyInfoInputs.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.AssemblyInfo.cs
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.csproj.CoreCompileInputs.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.sourcelink.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/bin/Debug/net8.0/AddisEats
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/bin/Debug/net8.0/AddisEats.deps.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/bin/Debug/net8.0/AddisEats.runtimeconfig.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/bin/Debug/net8.0/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/bin/Debug/net8.0/AddisEats.pdb
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/refint/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.pdb
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/AddisEats.genruntimeconfig.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis eats order/AddisEats/obj/Debug/net8.0/ref/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/bin/Debug/net8.0/AddisEats
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/bin/Debug/net8.0/AddisEats.deps.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/bin/Debug/net8.0/AddisEats.runtimeconfig.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/bin/Debug/net8.0/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/bin/Debug/net8.0/AddisEats.pdb
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.GeneratedMSBuildEditorConfig.editorconfig
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.AssemblyInfoInputs.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.AssemblyInfo.cs
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.csproj.CoreCompileInputs.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.sourcelink.json
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/refint/AddisEats.dll
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.pdb
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/AddisEats.genruntimeconfig.cache
+/home/thesh/projects/CodeOps_Daily_practices-and-Projects/module-04-backend/mini-project/Addis-eats-order/AddisEats/obj/Debug/net8.0/ref/AddisEats.dll
