@@ -1,0 +1,6 @@
+@AddisEats_api_HostAddress = http://localhost:5105
+
+GET {{AddisEats_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
