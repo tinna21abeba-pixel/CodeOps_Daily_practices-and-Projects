@@ -2,16 +2,19 @@ using AddisEats.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Register services
 builder.Services.AddControllers();
-builder.Services.AddSingleton<IClock, SystemClock>();
+builder.Services.AddScoped<IClock, SystemClock>();
+
+builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Build application
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -22,15 +25,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Map controller routes
 app.MapControllers();
 
-app.Run();
-
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
+// Start application
 app.Run();
