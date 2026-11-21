@@ -7,15 +7,15 @@ namespace AddisEats.Api.Controllers;
 [Route("api/v1/health")]
 public class HealthController : ControllerBase
 {
-    private readonly IClock _clock;
-    private readonly IHostEnvironment _environment;
+    private readonly IClock _clock1;
+    private readonly IClock _clock2;
 
     public HealthController(
-        IClock clock,
-        IHostEnvironment environment)
+        IClock clock1,
+        IClock clock2)
     {
-        _clock = clock;
-        _environment = environment;
+        _clock1 = clock1;
+        _clock2 = clock2;
     }
 
     [HttpGet]
@@ -23,9 +23,8 @@ public class HealthController : ControllerBase
     {
         return Ok(new
         {
-            Status = "Healthy",
-            UtcTime = _clock.UtcNow,
-            Environment = _environment.EnvironmentName
+            FirstInstance = _clock1.UtcNow,
+            SecondInstance = _clock2.UtcNow
         });
     }
 }
