@@ -1,6 +1,21 @@
 @AddisEats.Api_HostAddress = http://localhost:5095
 
-GET {{AddisEats.Api_HostAddress}}/weatherforecast/
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?page=1&limit=5
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?page=2&limit=5
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/12/menu
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/999/menu
 Accept: application/json
 
 ###
