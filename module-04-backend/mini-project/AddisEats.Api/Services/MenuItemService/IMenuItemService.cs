@@ -1,10 +1,8 @@
 using AddisEats.Api.Models;
+using AddisEats.Api.Services.MenuService;
 
 namespace AddisEats.Api.MenuItemServices;
 
-public interface IMenuItemService
+public interface IMenuItemService : IMenuService
 {
-    List<MenuItem> GetAll( string ? category);
-
-    MenuItem? GetById(int id);
 }

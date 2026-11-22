@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="../build/ADdisEAts.Api.props" />
-</Project>
