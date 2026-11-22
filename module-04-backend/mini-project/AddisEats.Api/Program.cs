@@ -5,8 +5,10 @@ using AddisEats.Api.Services.MenuService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Register configuration options
 builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOptions.SectionName));
 
+// Register services
 builder.Services.AddControllers();
 
 builder.Services.AddScoped<IMenuService, MenuService>();
@@ -22,6 +24,7 @@ Console.WriteLine(thePhoneNumber);
 
 var app = builder.Build();
 
+// Configure HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -29,6 +32,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
 app.MapControllers();
