@@ -12,29 +12,36 @@ public class RestaurantService : IRestaurantService
         return _restaurants.FirstOrDefault(r => r.Id == id);
     }
 
-    public IEnumerable<Restaurant> Search(string? area = null, int page = 1, int limit = 10)
+    public IEnumerable<Restaurant> Search(RestaurantQuery query)
     {
-        var query = _restaurants.AsEnumerable();
+        var result = _restaurants.AsEnumerable();
 
-        if (!string.IsNullOrWhiteSpace(area))
+        if (query.Areas != null && query.Areas.Count > 0)
         {
-            query = query.Where(r => r.Area.Equals(area, StringComparison.OrdinalIgnoreCase));
+            result = result.Where(r => query.Areas.Any(a => r.Area.Equals(a, StringComparison.OrdinalIgnoreCase)));
+        }
+        else if (!string.IsNullOrWhiteSpace(query.Area))
+        {
+            result = result.Where(r => r.Area.Equals(query.Area, StringComparison.OrdinalIgnoreCase));
         }
 
-        if (page < 1)
+        if (query.MaxFeeEtb.HasValue)
         {
-            page = 1;
+            result = result.Where(r => r.DeliveryFee <= query.MaxFeeEtb.Value);
         }
 
-        if (limit < 1)
-        {
-            limit = 10;
-        }
+        int page = query.Page < 1 ? 1 : query.Page;
+        int limit = query.Limit < 1 ? 10 : query.Limit;
 
-        return query
+        return result
             .OrderBy(r => r.Id)
             .Skip((page - 1) * limit)
             .Take(limit)
             .ToList();
+    }
+
+    public IEnumerable<Restaurant> Search(string? area = null, int page = 1, int limit = 10)
+    {
+        return Search(new RestaurantQuery { Area = area, Page = page, Limit = limit });
     }
 }

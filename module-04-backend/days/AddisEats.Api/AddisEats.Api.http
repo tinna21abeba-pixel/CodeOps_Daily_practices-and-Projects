@@ -5,17 +5,55 @@ Accept: application/json
 
 ###
 
-GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?page=2&limit=5
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/abc
 Accept: application/json
 
 ###
 
-GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/12/menu
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?area=Bole&maxFeeEtb=85&page=1&limit=5
 Accept: application/json
 
 ###
 
-GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/999/menu
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?areas=Bole&areas=Piassa
 Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/1
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/by-name/Kategna%20Restaurant
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/1/menu
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/orders/1
+Accept: application/json
+
+###
+
+POST {{AddisEats.Api_HostAddress}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 2,
+  "customerName": "Tadesse Belay",
+  "totalAmount": 380.00,
+  "specialInstructions": null
+}
 
 ###

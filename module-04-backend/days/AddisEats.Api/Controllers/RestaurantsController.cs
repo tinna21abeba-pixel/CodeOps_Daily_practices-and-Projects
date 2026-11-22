@@ -16,15 +16,15 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult Search([FromQuery] string? area, [FromQuery] int page = 1, [FromQuery] int limit = 10)
+    public IActionResult Search([FromQuery] RestaurantQuery query)
     {
-        var restaurants = _restaurantService.Search(area, page, limit);
+        var restaurants = _restaurantService.Search(query);
         var dtos = restaurants.Select(r => r.ToDto());
         return Ok(dtos);
     }
 
     [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
+    public ActionResult<RestaurantDto> GetOne(int id)
     {
         var restaurant = _restaurantService.GetById(id);
         if (restaurant == null)
@@ -45,5 +45,19 @@ public class RestaurantsController : ControllerBase
         }
 
         return Ok(restaurant.Menu);
+    }
+
+    [HttpGet("by-name/{name}")]
+    public IActionResult GetByName(string name)
+    {
+        var restaurant = _restaurantService.Search(new RestaurantQuery { Area = null, Page = 1, Limit = 100 })
+            .FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (restaurant == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(restaurant.ToDto());
     }
 }
