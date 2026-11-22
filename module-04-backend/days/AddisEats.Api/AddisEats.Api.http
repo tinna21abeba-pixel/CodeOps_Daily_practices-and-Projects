@@ -5,7 +5,7 @@ Accept: application/json
 
 ###
 
-GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/abc
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?name=Kategna
 Accept: application/json
 
 ###
@@ -20,17 +20,12 @@ Accept: application/json
 
 ###
 
-GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants
+GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants?unknownParam=invalid
 Accept: application/json
 
 ###
 
 GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/1
-Accept: application/json
-
-###
-
-GET {{AddisEats.Api_HostAddress}}/api/v1/restaurants/by-name/Kategna%20Restaurant
 Accept: application/json
 
 ###
@@ -55,5 +50,47 @@ Accept: application/json
   "totalAmount": 380.00,
   "specialInstructions": null
 }
+
+###
+
+POST {{AddisEats.Api_HostAddress}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 2,
+  "customerName": "Invalid Order",
+  "totalAmount": -50.00
+}
+
+###
+
+PATCH {{AddisEats.Api_HostAddress}}/api/v1/orders/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "Delivered"
+}
+
+###
+
+PATCH {{AddisEats.Api_HostAddress}}/api/v1/orders/2/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "Cancelled"
+}
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/delivery/options
+Accept: application/json
+
+###
+
+GET {{AddisEats.Api_HostAddress}}/api/v1/payment?amount=250.00
+Accept: application/json
 
 ###

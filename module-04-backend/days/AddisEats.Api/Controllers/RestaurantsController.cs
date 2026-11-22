@@ -46,18 +46,4 @@ public class RestaurantsController : ControllerBase
 
         return Ok(restaurant.Menu);
     }
-
-    [HttpGet("by-name/{name}")]
-    public IActionResult GetByName(string name)
-    {
-        var restaurant = _restaurantService.Search(new RestaurantQuery { Area = null, Page = 1, Limit = 100 })
-            .FirstOrDefault(r => r.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-        if (restaurant == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(restaurant.ToDto());
-    }
 }

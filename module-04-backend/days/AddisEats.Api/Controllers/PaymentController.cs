@@ -15,7 +15,7 @@ public class PaymentController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult ProcessPayment(decimal amount)
+    public IActionResult ProcessPayment([FromQuery] decimal amount)
     {
         return Ok(new
         {

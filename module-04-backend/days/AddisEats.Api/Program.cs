@@ -1,12 +1,16 @@
-using AddisEats.Api.Services;
+using AddisEats.Api.Filters;
 using AddisEats.Api.Models;
+using AddisEats.Api.Services;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<DeliveryOptions>(builder.Configuration.GetSection("Delivery"));
 
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add<RejectUnknownQueryParamsFilter>();
+    })
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;

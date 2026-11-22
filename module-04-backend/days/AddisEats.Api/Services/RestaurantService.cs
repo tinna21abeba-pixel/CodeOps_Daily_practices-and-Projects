@@ -16,6 +16,11 @@ public class RestaurantService : IRestaurantService
     {
         var result = _restaurants.AsEnumerable();
 
+        if (!string.IsNullOrWhiteSpace(query.Name))
+        {
+            result = result.Where(r => r.Name.Contains(query.Name, StringComparison.OrdinalIgnoreCase));
+        }
+
         if (query.Areas != null && query.Areas.Count > 0)
         {
             result = result.Where(r => query.Areas.Any(a => r.Area.Equals(a, StringComparison.OrdinalIgnoreCase)));
@@ -31,7 +36,7 @@ public class RestaurantService : IRestaurantService
         }
 
         int page = query.Page < 1 ? 1 : query.Page;
-        int limit = query.Limit < 1 ? 10 : query.Limit;
+        int limit = query.Limit;
 
         return result
             .OrderBy(r => r.Id)
