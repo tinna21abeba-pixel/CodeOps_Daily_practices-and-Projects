@@ -1,30 +1,41 @@
 using AddisEats.Api.Models;
 using AddisEats.Api.MenuItemServices;
 using AddisEats.Api.ResturantServices;
+using AddisEats.Api.Services;
 using AddisEats.Api.Services.MenuService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register configuration options
 builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOptions.SectionName));
 
-// Register services
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<IMenuItemService, MenuService>();
 builder.Services.AddScoped<IResturantService, ResturantService>();
 builder.Services.AddScoped<IRestuarantService, ResturantService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "https://localhost:5173",
+            "http://localhost:3000",
+            "https://localhost:3000"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var thePhoneNumber = builder.Configuration.GetValue<string>("data:contact:phone");
-Console.WriteLine(thePhoneNumber);
-
 var app = builder.Build();
 
-// Configure HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -32,6 +43,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("frontend");
 
 app.UseAuthorization();
 

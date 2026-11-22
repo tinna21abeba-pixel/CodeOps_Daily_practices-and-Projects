@@ -1,3 +1,4 @@
+using AddisEats.Api.Data;
 using AddisEats.Api.Models;
 using AddisEats.Api.DTOs;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
         new MenuItem
         {
             Id = 1,
+            RestaurantId = 1,
             Name = "Caesar Salad",
             Category = "Food",
             Price = 250m,
@@ -21,6 +23,7 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
         new MenuItem
         {
             Id = 2,
+            RestaurantId = 1,
             Name = "Doro Wot",
             Category = "Food",
             Price = 400m,
@@ -29,6 +32,7 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
         new MenuItem
         {
             Id = 3,
+            RestaurantId = 1,
             Name = "Coffee",
             Category = "Drinks",
             Price = 100m,
@@ -72,6 +76,23 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
         {
             return _menuItems.FirstOrDefault(m => m.Id == id);
         }
+    }
+
+    public List<MenuItem> ForRestaurant(int restaurantId, string? category = null)
+    {
+        var restaurant = SeedData.Restaurants.FirstOrDefault(r => r.Id == restaurantId);
+        if (restaurant == null)
+        {
+            return new List<MenuItem>();
+        }
+
+        var items = restaurant.Menu.AsEnumerable();
+        if (!string.IsNullOrWhiteSpace(category))
+        {
+            items = items.Where(m => m.Category.Equals(category.Trim(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        return items.ToList();
     }
 
     public MenuItem Add(CreateMenuItemRequest request)

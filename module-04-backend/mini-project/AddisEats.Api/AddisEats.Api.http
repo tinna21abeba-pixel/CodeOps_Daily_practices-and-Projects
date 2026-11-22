@@ -1,0 +1,41 @@
+@host = http://localhost:5062
+
+GET {{host}}/api/v1/restaurants
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants?area=Bole&page=1&limit=5
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/1
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/9999
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/1/menu
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/1/menu?category=Traditional
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/1/menu?category=NonExistent
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/9999/menu
+Accept: application/json
+
+###

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace AddisEats.Api.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 [ApiController]
 [Route("api/v1/menu")]
 public class MenuController : ControllerBase
