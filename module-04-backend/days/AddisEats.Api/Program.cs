@@ -1,6 +1,8 @@
 using AddisEats.Api.Services;
+using AddisEats.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<DeliveryOptions>(builder.Configuration.GetSection("Delivery"));
 
 // Register services
 builder.Services.AddControllers();
