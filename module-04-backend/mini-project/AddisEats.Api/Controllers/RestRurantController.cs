@@ -7,9 +7,7 @@ using AddisEats.Api.ResturantServices;
 namespace AddisEats.Api.Controllers;
 
 [ApiController]
-[Route("api/v1/[controller]")]
-[Route("api/v1/Restuarant")]
-[Route("api/v1/Restuarantontroller")]
+[Route("api/v1/restaurants")]
 public class ResturantController : ControllerBase
 {
     private readonly IResturantService _resturanService;
@@ -19,9 +17,9 @@ public class ResturantController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAllRestuarant([FromQuery] string? adress, [FromQuery] string? address = null, [FromQuery] int? pageSize = 10, [FromQuery] int? page = 1)
+    public IActionResult GetAllRestuarant([FromQuery] string? area, [FromQuery] int? limit = 10, [FromQuery] int? page = 1)
     {
-        var restuarants = _resturanService.GetAll(address ?? adress, page, pageSize);
+        var restuarants = _resturanService.GetAll(area, limit, page);
         var restuarantDTOs = restuarants.Select(r => r.ToDTOs()).ToList();
 
         return Ok(restuarantDTOs);
@@ -37,6 +35,6 @@ public class ResturantController : ControllerBase
             return NotFound();
         }
 
-        return Ok(restuarant);
+        return Ok(restuarant.ToDTOs());
     }
 }
