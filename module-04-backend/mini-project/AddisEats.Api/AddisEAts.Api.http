@@ -10,12 +10,22 @@ Accept: application/json
 
 ###
 
+GET {{host}}/api/v1/restaurants?areas=Bole&areas=Piassa
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants?maxFeeEtb=85&page=1&limit=5
+Accept: application/json
+
+###
+
 GET {{host}}/api/v1/restaurants/1
 Accept: application/json
 
 ###
 
-GET {{host}}/api/v1/restaurants/9999
+GET {{host}}/api/v1/restaurants/abc
 Accept: application/json
 
 ###
@@ -25,17 +35,65 @@ Accept: application/json
 
 ###
 
-GET {{host}}/api/v1/restaurants/1/menu?category=Traditional
+GET {{host}}/api/v1/restaurants/abc/menu
 Accept: application/json
 
 ###
 
-GET {{host}}/api/v1/restaurants/1/menu?category=NonExistent
+GET {{host}}/api/v1/orders/1
 Accept: application/json
 
 ###
 
-GET {{host}}/api/v1/restaurants/9999/menu
+GET {{host}}/api/v1/orders/invalid-id
+Accept: application/json
+
+###
+
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 1,
+  "customerName": "Tadesse Belay",
+  "totalAmount": 380.00,
+  "specialInstructions": null
+}
+
+###
+
+PATCH {{host}}/api/v1/orders/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "Delivered"
+}
+
+###
+
+PATCH {{host}}/api/v1/orders/1/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "Cancelled"
+}
+
+###
+
+GET {{host}}/api/v1/menu
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/menu/1
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/menu/not-an-int
 Accept: application/json
 
 ###

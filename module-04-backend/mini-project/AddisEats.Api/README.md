@@ -1,6 +1,6 @@
 # Addis Eats API
 
-A running ASP.NET Core Web API over the Addis Eats menu and restaurant services.
+ASP.NET Core Web API for Addis Eats restaurant, menu, and order operations.
 
 ## Getting Started
 
@@ -13,75 +13,63 @@ From this directory:
 dotnet run
 ```
 By default, the application runs and serves Swagger documentation at:
-- `http://localhost:5062/swagger` (or port specified in `Properties/launchSettings.json`)
+- `http://localhost:5062/swagger`
 
 ---
 
-## API Endpoints
+## Complete Route Table
 
-### Menu Endpoints (`/api/v1/menu`)
-
-#### 1. `GET /api/v1/menu`
-Retrieves all menu items with optional category filtering and pagination.
-
-- **Query Parameters**:
-  - `category` (optional, string): Filters items by category (e.g., `Food`, `Drinks`).
-  - `page` (optional, integer): Page number (1-based).
-  - `pageSize` (optional, integer): Items per page (defaults to `MenuOptions:DefaultPageSize` in `appsettings.json`, default: 10).
-- **Status Codes**:
-  - `200 OK`: Successfully returned list of menu items.
-
----
-
-#### 2. `GET /api/v1/menu/{id}`
-Retrieves a specific menu item by its integer ID.
-
-- **Path Parameters**:
-  - `id` (integer, required): Unique identifier of the menu item.
-- **Status Codes**:
-  - `200 OK`: Menu item found and returned.
-  - `404 Not Found`: No menu item with the specified ID exists.
+| Verb | Path | Constraints | Query Parameters | Success Code | Failure Codes | Purpose |
+|---|---|---|---|---|---|---|
+| GET | `/api/v1/restaurants` | None | `area` (string?), `areas` (List<string>?), `maxFeeEtb` (decimal?), `page` (int, default: 1), `limit` (int, default: 20) | 200 OK | 400 Bad Request | List restaurants in envelope format with multi-value filtering and pagination |
+| GET | `/api/v1/restaurants/{id:int}` | `id:int` | None | 200 OK | 404 Not Found | Retrieve details of a single restaurant by integer ID |
+| GET | `/api/v1/restaurants/{id:int}/menu` | `id:int` | `category` (string?) | 200 OK | 404 Not Found | Retrieve menu items for a specific restaurant |
+| GET | `/api/v1/orders/{id:int}` | `id:int` | None | 200 OK | 404 Not Found | Retrieve order details and current status |
+| POST | `/api/v1/orders` | None | None | 201 Created | 400 Bad Request | Place a new customer order returning Location header from CreatedAtAction |
+| PATCH | `/api/v1/orders/{id:int}/status` | `id:int` | None | 200 OK | 404 Not Found, 409 Conflict | Update order lifecycle status (returns 409 if order was already delivered) |
+| GET | `/api/v1/menu` | None | `category` (string?), `page` (int?), `pageSize` (int?) | 200 OK | None | List global menu items in standard envelope |
+| GET | `/api/v1/menu/{id:int}` | `id:int` | None | 200 OK | 404 Not Found | Retrieve a specific menu item by integer ID |
+| POST | `/api/v1/menu` | None | None | 201 Created | 400 Bad Request | Create a new menu item returning Location header |
 
 ---
 
-#### 3. `POST /api/v1/menu`
-Creates a new menu item.
+## Architectural & Design Implementations
 
-- **Request Body** (`application/json`):
-  ```json
-  {
-    "name": "Shiro Tegabino",
-    "category": "Food",
-    "price": 180.00
-  }
-  ```
-- **Validation Rules**:
-  - `price` must be a positive ETB decimal (`price > 0`). Non-positive prices (<= 0) return `400 Bad Request`.
-  - `name` cannot be empty.
-  - `priceWithVat` is automatically computed at 15% VAT if not explicitly provided.
-  - No ETB value is stored as a double; all monetary amounts use `decimal`.
-- **Status Codes**:
-  - `201 Created`: Item created successfully. Returns the created item and a `Location` header pointing to `/api/v1/menu/{id}`.
-  - `400 Bad Request`: When price is non-positive (<= 0 ETB), name is missing, or payload is invalid.
+### Route Constraints
+Every identifier route segment is constrained with `:int`:
+- `GET /api/v1/restaurants/{id:int}`
+- `GET /api/v1/restaurants/{id:int}/menu`
+- `GET /api/v1/orders/{id:int}`
+- `PATCH /api/v1/orders/{id:int}/status`
+- `GET /api/v1/menu/{id:int}`
 
----
+Non-integer values (such as `/api/v1/restaurants/abc`) fail route matching at route selection time and return `404 Not Found`.
 
-### Restaurant Endpoints (`/api/v1/Resturant`)
+### Bound Query Object & Multi-Value Filtering
+`RestaurantQuery` is bound using `[FromQuery]` on `GET /api/v1/restaurants`:
+- `Area` (`string?`) - Optional single area filter
+- `Areas` (`List<string>?`) - Optional multi-value area filter (e.g., `?areas=Bole&areas=Piassa`)
+- `MaxFeeEtb` (`decimal?`) - Nullable filter so missing parameter does not default to 0
+- `Page` (`int`, default: 1)
+- `Limit` (`int`, default: 20)
 
-#### 1. `GET /api/v1/Resturant`
-Retrieves restaurant listings with optional address filter and pagination.
-- **Status Codes**:
-  - `200 OK`: Returns list of restaurants (as DTOs excluding sensitive owner details).
+### Consistent Collection Envelope
+All collection endpoints return the standard `PagedResponse<T>` envelope:
+```json
+{
+  "data": [ ... ],
+  "page": 1,
+  "pageSize": 20
+}
+```
 
-#### 2. `GET /api/v1/Resturant/{id}`
-Retrieves a restaurant by ID.
-- **Status Codes**:
-  - `200 OK`: Restaurant found.
-  - `404 Not Found`: Restaurant not found.
+### Orders Controller & Location Header
+`OrdersController` handles order reads and writes:
+- `POST /api/v1/orders` creates an order and returns `201 Created` with a resolving `Location` header via `CreatedAtAction(nameof(GetById), new { id = order.Id }, order)`.
+- `PATCH /api/v1/orders/{id:int}/status` updates order status and guards against invalid transitions (e.g., cancelling an already delivered order returns `409 Conflict`).
 
----
-
-## Architecture & Design Patterns
-- **Interface Segregation & Dependency Injection**: `MenuService` implements `IMenuService` and is registered as scoped (`builder.Services.AddScoped<IMenuService, MenuService>()`). No controller calls `new` on any service.
-- **Options Pattern**: Default page size is configured in `appsettings.json` under `"MenuOptions"`, bound to `MenuOptions`, and injected via `IOptions<MenuOptions>`.
-- **Accurate Currency Storage**: All monetary ETB values are strictly typed as `decimal` throughout models, DTOs, and services.
+### JSON Formatting
+Configured in `Program.cs`:
+- Property naming policy: camelCase
+- Null value handling: omitted nulls (`JsonIgnoreCondition.WhenWritingNull`)
+- Enum conversion: string enums (`JsonStringEnumConverter`)

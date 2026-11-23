@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace AddisEats.Api.Controllers;
 
-[ApiExplorerSettings(IgnoreApi = true)]
 [ApiController]
 [Route("api/v1/menu")]
 public class MenuController : ControllerBase
@@ -21,20 +20,22 @@ public class MenuController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(List<MenuItem>), StatusCodes.Status200OK)]
-    public IActionResult GetAll(
+    [ProducesResponseType(typeof(PagedResponse<MenuItem>), StatusCodes.Status200OK)]
+    public ActionResult<PagedResponse<MenuItem>> GetAll(
         [FromQuery] string? category,
         [FromQuery] int? page = null,
         [FromQuery] int? pageSize = null)
     {
-        var items = _menuService.GetAll(category, page, pageSize ?? _options.DefaultPageSize);
-        return Ok(items);
+        int currentPage = page ?? 1;
+        int currentPageSize = pageSize ?? _options.DefaultPageSize;
+        var items = _menuService.GetAll(category, currentPage, currentPageSize);
+        return Ok(new PagedResponse<MenuItem>(items, currentPage, currentPageSize));
     }
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(MenuItem), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetById(int id)
+    public ActionResult<MenuItem> GetById(int id)
     {
         var item = _menuService.GetById(id);
 
@@ -49,7 +50,7 @@ public class MenuController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(MenuItem), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult Create([FromBody] CreateMenuItemRequest request)
+    public ActionResult<MenuItem> Create([FromBody] CreateMenuItemRequest request)
     {
         if (request == null)
         {

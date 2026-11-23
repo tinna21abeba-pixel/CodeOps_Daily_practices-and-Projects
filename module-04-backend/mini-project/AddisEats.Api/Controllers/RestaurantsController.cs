@@ -22,24 +22,19 @@ public class RestaurantsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<RestaurantDto>), StatusCodes.Status200OK)]
-    public IActionResult GetAll([FromQuery] string? area, [FromQuery] int page = 1, [FromQuery] int limit = 20)
+    public ActionResult<PagedResponse<RestaurantDto>> GetAll([FromQuery] RestaurantQuery query)
     {
-        var results = _service.Search(area, page, limit)
+        var results = _service.Search(query)
             .Select(r => r.ToDto())
             .ToList();
 
-        if (HttpContext.Request.Query.TryGetValue("envelope", out var env) && env == "false")
-        {
-            return Ok(results);
-        }
-
-        return Ok(new { data = results, page, pageSize = limit });
+        return Ok(new PagedResponse<RestaurantDto>(results, query.Page, query.Limit));
     }
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(RestaurantDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetOne(int id)
+    public ActionResult<RestaurantDto> GetOne(int id)
     {
         var found = _service.GetById(id);
         if (found is null)
@@ -53,7 +48,7 @@ public class RestaurantsController : ControllerBase
     [HttpGet("{id:int}/menu")]
     [ProducesResponseType(typeof(List<MenuItemDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetMenu(int id, [FromQuery] string? category)
+    public ActionResult<List<MenuItemDto>> GetMenu(int id, [FromQuery] string? category)
     {
         if (_service.GetById(id) is null)
         {
