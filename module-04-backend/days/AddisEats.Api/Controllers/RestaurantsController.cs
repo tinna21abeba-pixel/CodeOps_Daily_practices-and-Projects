@@ -1,8 +1,8 @@
+namespace AddisEats.Api.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using AddisEats.Api.Models;
 using AddisEats.Api.Services;
-
-namespace AddisEats.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
@@ -29,7 +29,13 @@ public class RestaurantsController : ControllerBase
         var restaurant = _restaurantService.GetById(id);
         if (restaurant == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/restaurant-not-found",
+                Title = "RESTAURANT_NOT_FOUND",
+                Status = StatusCodes.Status404NotFound,
+                Detail = "The requested restaurant could not be found."
+            });
         }
 
         return Ok(restaurant.ToDto());
@@ -41,7 +47,13 @@ public class RestaurantsController : ControllerBase
         var restaurant = _restaurantService.GetById(id);
         if (restaurant == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/restaurant-not-found",
+                Title = "RESTAURANT_NOT_FOUND",
+                Status = StatusCodes.Status404NotFound,
+                Detail = "The requested restaurant could not be found."
+            });
         }
 
         return Ok(restaurant.Menu);

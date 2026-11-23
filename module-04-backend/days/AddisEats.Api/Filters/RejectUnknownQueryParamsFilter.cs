@@ -1,9 +1,9 @@
+namespace AddisEats.Api.Filters;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Reflection;
-
-namespace AddisEats.Api.Filters;
 
 public class RejectUnknownQueryParamsFilter : IActionFilter
 {
@@ -43,10 +43,10 @@ public class RejectUnknownQueryParamsFilter : IActionFilter
         {
             var problemDetails = new ProblemDetails
             {
-                Type = "https://addiseats.et/errors/validation",
-                Title = "Unknown query parameter",
+                Type = "https://addiseats.et/errors/unknown-query-parameter",
+                Title = "UNKNOWN_QUERY_PARAMETER",
                 Status = StatusCodes.Status400BadRequest,
-                Detail = $"Unknown query parameter: '{string.Join("', '", unknownKeys)}'."
+                Detail = $"One or more unrecognized query parameters were provided. Please verify spelling. Unknown: '{string.Join("', '", unknownKeys)}'."
             };
 
             context.Result = new BadRequestObjectResult(problemDetails);
@@ -57,3 +57,4 @@ public class RejectUnknownQueryParamsFilter : IActionFilter
     {
     }
 }
+

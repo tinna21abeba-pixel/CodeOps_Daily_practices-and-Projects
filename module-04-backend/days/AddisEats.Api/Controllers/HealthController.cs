@@ -1,7 +1,7 @@
+namespace AddisEats.Api.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using AddisEats.Api.Services;
-
-namespace AddisEats.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/health")]
@@ -26,5 +26,11 @@ public class HealthController : ControllerBase
             FirstInstance = _clock1.UtcNow,
             SecondInstance = _clock2.UtcNow
         });
+    }
+
+    [HttpGet("error")]
+    public IActionResult DeliberateError()
+    {
+        throw new InvalidOperationException("Deliberate unhandled exception for middleware verification.");
     }
 }

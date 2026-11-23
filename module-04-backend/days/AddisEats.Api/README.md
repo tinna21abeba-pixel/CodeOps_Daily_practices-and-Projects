@@ -391,3 +391,455 @@ Implemented `RejectUnknownQueryParamsFilter` registered globally in `Program.cs`
 4. Clamps `RestaurantQuery.Limit` to a maximum threshold of 50 to prevent unbounded queries.
 
 
+
+
+---
+
+# Addis Eats API - Day 58 Exercises
+
+## Exercise 1 - DataAnnotations on CreateOrderRequest
+
+Annotated `CreateOrderRequest` with `[Required]`, `[Range]`, `[StringLength]`, and `[MinLength]`, specifying custom error messages for each validation rule:
+
+```csharp
+public class CreateOrderRequest : IValidatableObject
+{
+    [Required(ErrorMessage = "Restaurant ID is required.")]
+    [Range(1, int.MaxValue, ErrorMessage = "Restaurant ID must be greater than zero.")]
+    public int RestaurantId { get; set; }
+
+    [Required(ErrorMessage = "Customer name is required.")]
+    [StringLength(100, ErrorMessage = "Customer name cannot exceed 100 characters.")]
+    [MinLength(2, ErrorMessage = "Customer name must be at least 2 characters long.")]
+    public string CustomerName { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Customer mobile phone number is required.")]
+    [EthiopianMobile(ErrorMessage = "Customer phone must be a valid Ethiopian mobile number (09..., 07..., or +251...).")]
+    public string CustomerPhone { get; set; } = string.Empty;
+
+    public bool IsDelivery { get; set; } = true;
+
+    [StringLength(200, ErrorMessage = "Delivery address cannot exceed 200 characters.")]
+    public string? DeliveryAddress { get; set; }
+
+    [StringLength(500, ErrorMessage = "Special instructions cannot exceed 500 characters.")]
+    public string? SpecialInstructions { get; set; }
+
+    [EtbAmount(ErrorMessage = "Tip amount must be positive with at most two decimal places.")]
+    public decimal? TipEtb { get; set; }
+
+    [Required(ErrorMessage = "Order items list is required.")]
+    [MinLength(1, ErrorMessage = "Order must contain at least one item.")]
+    public List<OrderItemRequest> Items { get; set; } = new();
+}
+```
+
+---
+
+## Exercise 2 - EthiopianMobileAttribute
+
+Created `EthiopianMobileAttribute` accepting prefixes `09`, `07`, `+2519`, and `+2517` with exactly 8 subsequent digits (total 9 digits after country code / 10 digits for domestic):
+Regex: `^(?:09\d{8}|07\d{8}|\+2519\d{8}|\+2517\d{8})$`
+
+### Test Numbers & Verification Results
+
+| # | Phone Number | Form / Category | Expected | Actual Result | Status |
+|---|---|---|---|---|---|
+| 1 | `0911234567` | Valid 09 prefix (Ethio Telecom, 10 digits) | Valid | Accepted | Passed |
+| 2 | `0712345678` | Valid 07 prefix (Safaricom, 10 digits) | Valid | Accepted | Passed |
+| 3 | `+251911234567` | Valid +2519 format (Ethio Telecom) | Valid | Accepted | Passed |
+| 4 | `+251712345678` | Valid +2517 format (Safaricom) | Valid | Accepted | Passed |
+| 5 | `0811234567` | Invalid prefix 08 | Invalid | Rejected | Passed |
+| 6 | `091123456` | Invalid length (9 digits, missing 1) | Invalid | Rejected | Passed |
+| 7 | `+2519112345678` | Invalid length (10 digits after +251, too long) | Invalid | Rejected | Passed |
+| 8 | `+252911234567` | Invalid country code (+252 Somalia, not +251) | Invalid | Rejected | Passed |
+
+---
+
+## Exercise 3 - EtbAmountAttribute
+
+Created `EtbAmountAttribute` rejecting zero, negative numbers, and numbers with more than two decimal places.
+
+### Verification Results
+
+| Value Tested | Condition Checked | Expected | Actual Result |
+|---|---|---|---|
+| `480.505` | Decimal scale (3 decimal places) | Rejected | Rejected |
+| `480.50` | Valid currency amount (2 decimal places) | Accepted | Accepted |
+| `0.00` | Zero amount boundary | Rejected | Rejected |
+| `-15.00` | Negative amount | Rejected | Rejected |
+
+---
+
+## Exercise 4 - Cross-Field Validation with IValidatableObject
+
+Implemented `IValidatableObject` on `CreateOrderRequest` to enforce that `DeliveryAddress` is required when `IsDelivery` is `true`:
+
+```csharp
+public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+{
+    if (IsDelivery && string.IsNullOrWhiteSpace(DeliveryAddress))
+    {
+        yield return new ValidationResult(
+            "Delivery address is required when delivery is requested.",
+            new[] { nameof(DeliveryAddress) });
+    }
+}
+```
+
+### One-line Explanation
+Property attributes only validate a single property in isolation without contextual access to inspect or correlate other sibling properties on the object instance.
+
+---
+
+## Exercise 5 - Result<T>, Error, and IOrderService
+
+Implemented `Error` and `Result<T>` domain types and refactored `IOrderService.Place` to return `Result<Order>`.
+
+### Three Catalogue Error Codes Returned from IOrderService.Place:
+1. `RESTAURANT_NOT_FOUND` (HTTP 404): Returned when the requested `restaurantId` does not exist in the catalogue.
+2. `RESTAURANT_CLOSED` (HTTP 409): Returned when attempting to order from a restaurant that has no available menu items (e.g., Restaurant ID 12 "Effoi Pizza Sarbet").
+3. `AMOUNT_INVALID` (HTTP 422): Returned when an ordered item does not belong to the restaurant, has non-positive quantity, or produces a non-positive total.
+
+---
+
+## Exercise 6 - Server-Side Order Pricing (Day 63 Foundation)
+
+Removed `totalEtb` from `CreateOrderRequest` entirely so the client cannot submit or tamper with order pricing. The server calculates `TotalAmount` strictly from authoritative menu prices and configured delivery fees:
+```csharp
+decimal itemsTotal = 0m;
+foreach (var itemReq in request.Items)
+{
+    var menuItem = restaurant.Menu.FirstOrDefault(m => m.Id == itemReq.MenuItemId);
+    itemsTotal += menuItem.Price * itemReq.Quantity;
+}
+decimal deliveryFee = request.IsDelivery ? restaurant.DeliveryFee : 0m;
+decimal tip = request.TipEtb ?? 0m;
+decimal totalEtb = itemsTotal + deliveryFee + tip;
+```
+
+### Attempting to Order for 1 ETB
+A client sends a payload containing an injected `"totalEtb": 1` field:
+```json
+POST /api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Cameroon St, Bole",
+  "isDelivery": true,
+  "items": [
+    {
+      "menuItemId": 101,
+      "quantity": 1
+    }
+  ],
+  "totalEtb": 1
+}
+```
+
+### Recorded Observation
+The server's JSON model binder binds the request to `CreateOrderRequest`, where `totalEtb` has been removed. The injected `"totalEtb": 1` property is completely ignored. The server fetches MenuItem `101` ("Doro Wat" at 450.00 ETB), adds Restaurant 1's delivery fee of 80.00 ETB, and sets `TotalAmount = 530.00 ETB`.
+
+The server responds with `201 Created`:
+```json
+{
+  "id": 3,
+  "restaurantId": 1,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Cameroon St, Bole",
+  "isDelivery": true,
+  "items": [
+    {
+      "menuItemId": 101,
+      "menuItemName": "Doro Wat",
+      "unitPrice": 450.0,
+      "quantity": 1
+    }
+  ],
+  "deliveryFee": 80.0,
+  "totalAmount": 530.0,
+  "status": "Pending",
+  "createdAt": "2026-11-23T15:10:00Z"
+}
+```
+**Conclusion**: Price tampering has zero effect; price calculation is completely server-authoritative.
+
+---
+
+## Exercise 7 - Exception Middleware
+
+Implemented `ExceptionMiddleware` registered first in `Program.cs` before any other middleware components.
+
+### Deliberate Throw Verification
+Endpoint: `GET /api/v1/health/error`
+Triggers: `throw new InvalidOperationException("Deliberate unhandled exception for middleware verification.");`
+
+### Response
+- **Status Code**: `500 Internal Server Error`
+- **Content-Type**: `application/problem+json`
+- **Response Body**:
+```json
+{
+  "type": "https://addiseats.et/errors/internal-server-error",
+  "title": "An unexpected error occurred",
+  "status": 500,
+  "detail": "An unexpected error occurred on the server. Please contact support with the trace identifier.",
+  "instance": "/api/v1/health/error",
+  "traceId": "00-2d85b190c7457a8e8f8103cba7e7da2f-10c0bfd6c2999e2c-00"
+}
+```
+**Confirmation**: Produces HTTP 500 with a unique `traceId` and zero internal stack trace leaked to the caller.
+
+---
+
+## Exercise 8 - Catalogue Codes Recorded from Real Requests
+
+### 1. `VALIDATION_FAILED` (400 Bad Request)
+**Request:**
+```http
+POST /api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 0,
+  "customerName": "A",
+  "customerPhone": "12345",
+  "items": []
+}
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/validation-failed",
+  "title": "VALIDATION_FAILED",
+  "status": 400,
+  "detail": "One or more fields in your request are invalid. Please check your submission and try again.",
+  "errors": {
+    "RestaurantId": [
+      "Restaurant ID must be greater than zero."
+    ],
+    "CustomerName": [
+      "Customer name must be at least 2 characters long."
+    ],
+    "CustomerPhone": [
+      "Customer phone must be a valid Ethiopian mobile number (09..., 07..., or +251...)."
+    ],
+    "Items": [
+      "Order must contain at least one item."
+    ]
+  }
+}
+```
+
+### 2. `UNKNOWN_QUERY_PARAMETER` (400 Bad Request)
+**Request:**
+```http
+GET /api/v1/restaurants?unexpectedParam=test
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/unknown-query-parameter",
+  "title": "UNKNOWN_QUERY_PARAMETER",
+  "status": 400,
+  "detail": "One or more unrecognized query parameters were provided. Please verify spelling. Unknown: 'unexpectedParam'."
+}
+```
+
+### 3. `UNAUTHORIZED` (401 Unauthorized)
+**Request:**
+```http
+GET /api/v1/orders/admin
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/unauthorized",
+  "title": "UNAUTHORIZED",
+  "status": 401,
+  "detail": "You must be signed in to perform this request."
+}
+```
+
+### 4. `PAYMENT_DECLINED` (402 Payment Required)
+**Request:**
+```http
+GET /api/v1/payment?amount=999999
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/payment-declined",
+  "title": "PAYMENT_DECLINED",
+  "status": 402,
+  "detail": "Your payment was declined by the provider. Please verify your balance and retry."
+}
+```
+
+### 5. `PERMISSION_DENIED` (403 Forbidden)
+**Request:**
+```http
+GET /api/v1/orders/admin
+Authorization: Bearer CourierToken123
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/forbidden",
+  "title": "PERMISSION_DENIED",
+  "status": 403,
+  "detail": "You do not have permission to perform this action."
+}
+```
+
+### 6. `RESTAURANT_NOT_FOUND` (404 Not Found)
+**Request:**
+```http
+GET /api/v1/restaurants/999
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/restaurant-not-found",
+  "title": "RESTAURANT_NOT_FOUND",
+  "status": 404,
+  "detail": "The requested restaurant could not be found."
+}
+```
+
+### 7. `ORDER_NOT_FOUND` (404 Not Found)
+**Request:**
+```http
+GET /api/v1/orders/999
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/not-found",
+  "title": "ORDER_NOT_FOUND",
+  "status": 404,
+  "detail": "The requested order with ID 999 could not be found."
+}
+```
+
+### 8. `ORDER_ALREADY_DELIVERED` (409 Conflict)
+**Request:**
+```http
+PATCH /api/v1/orders/2/status
+Content-Type: application/json
+
+{
+  "status": "Cancelled"
+}
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/order-already-delivered",
+  "title": "ORDER_ALREADY_DELIVERED",
+  "status": 409,
+  "detail": "Order 2 has already been delivered and can no longer be modified or cancelled."
+}
+```
+
+### Supplementary Catalogue Codes:
+
+#### 9. `RESTAURANT_CLOSED` (409 Conflict)
+**Request:**
+```http
+POST /api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 12,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Sarbet",
+  "items": [
+    {
+      "menuItemId": 1,
+      "quantity": 1
+    }
+  ]
+}
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/restaurant-closed",
+  "title": "RESTAURANT_CLOSED",
+  "status": 409,
+  "detail": "Restaurant 'Effoi Pizza Sarbet' is currently closed. Please place your order during operating hours."
+}
+```
+
+#### 10. `AMOUNT_INVALID` (422 Unprocessable Entity)
+**Request:**
+```http
+POST /api/v1/orders
+Content-Type: application/json
+
+{
+  "restaurantId": 1,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Cameroon St, Bole",
+  "items": [
+    {
+      "menuItemId": 999,
+      "quantity": 1
+    }
+  ]
+}
+```
+**Response Body:**
+```json
+{
+  "type": "https://addiseats.et/errors/amount-invalid",
+  "title": "AMOUNT_INVALID",
+  "status": 422,
+  "detail": "Menu item with ID 999 does not belong to restaurant 'Bole Doro & Kitfo'."
+}
+```
+
+---
+
+## Git Commit Mapping (One Commit Each)
+
+```bash
+# Exercise 1: Annotate CreateOrderRequest
+git add AddisEats.Api/Models/Order.cs
+git commit -m "feat: annotate CreateOrderRequest with Required, Range, StringLength and MinLength"
+
+# Exercise 2: EthiopianMobileAttribute
+git add AddisEats.Api/Validation/EthiopianMobileAttribute.cs
+git commit -m "feat: implement EthiopianMobileAttribute accepting 09, 07 and both +251 forms"
+
+# Exercise 3: EtbAmountAttribute
+git add AddisEats.Api/Validation/EtbAmountAttribute.cs
+git commit -m "feat: implement EtbAmountAttribute rejecting zero, negatives, and >2 decimal places"
+
+# Exercise 4: IValidatableObject cross-field validation
+git add AddisEats.Api/Models/Order.cs
+git commit -m "feat: enforce cross-field rule with IValidatableObject on CreateOrderRequest"
+
+# Exercise 5: Result<T>, Error, and IOrderService.Place
+git add AddisEats.Api/Common/Error.cs AddisEats.Api/Common/Result.cs AddisEats.Api/Services/IOrderService.cs AddisEats.Api/Services/OrderService.cs
+git commit -m "feat: add Result<T> and Error types and return catalogue codes from IOrderService.Place"
+
+# Exercise 6: Server-side order total computation
+git add AddisEats.Api/Models/Order.cs AddisEats.Api/Services/OrderService.cs AddisEats.Api/Controllers/OrdersController.cs
+git commit -m "feat: compute order total on server from menu prices and remove totalEtb from request"
+
+# Exercise 7: Exception middleware
+git add AddisEats.Api/Middleware/ExceptionMiddleware.cs AddisEats.Api/Controllers/HealthController.cs AddisEats.Api/Program.cs
+git commit -m "feat: add ExceptionMiddleware producing 500 with traceId and no stack trace"
+
+# Exercise 8: Catalogue responses in README
+git add AddisEats.Api/README.md AddisEats.Api/Filters/RejectUnknownQueryParamsFilter.cs AddisEats.Api/Controllers/PaymentController.cs AddisEats.Api/Controllers/RestaurantsController.cs
+git commit -m "docs: produce all catalogue codes from real requests and record responses in README"
+```

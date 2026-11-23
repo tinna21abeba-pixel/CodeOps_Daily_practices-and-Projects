@@ -1,43 +1,39 @@
+namespace AddisEats.Api.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
 using AddisEats.Api.Models;
-
-namespace AddisEats.Api.Controllers;
+using AddisEats.Api.Services;
 
 [ApiController]
 [Route("api/v1/[controller]")]
 public class OrdersController : ControllerBase
 {
-    private static readonly List<Order> _orders = new()
+    private readonly IOrderService _orderService;
+
+    public OrdersController(IOrderService orderService)
     {
-        new Order
-        {
-            Id = 1,
-            RestaurantId = 1,
-            CustomerName = "Abebe Kebede",
-            TotalAmount = 450.00m,
-            Status = OrderStatus.Preparing,
-            SpecialInstructions = null,
-            CreatedAt = new DateTime(2026, 11, 22, 20, 0, 0, DateTimeKind.Utc)
-        },
-        new Order
-        {
-            Id = 2,
-            RestaurantId = 2,
-            CustomerName = "Tadesse Belay",
-            TotalAmount = 380.00m,
-            Status = OrderStatus.Delivered,
-            SpecialInstructions = null,
-            CreatedAt = new DateTime(2026, 11, 22, 19, 0, 0, DateTimeKind.Utc)
-        }
-    };
+        _orderService = orderService;
+    }
+
+    [HttpGet]
+    public IActionResult GetAll()
+    {
+        return Ok(_orderService.GetAll());
+    }
 
     [HttpGet("{id:int}")]
     public ActionResult<Order> GetById(int id)
     {
-        var order = _orders.FirstOrDefault(o => o.Id == id);
+        var order = _orderService.GetById(id);
         if (order == null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/not-found",
+                Title = "Order Not Found",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"The requested order with ID {id} could not be found."
+            });
         }
 
         return Ok(order);
@@ -46,55 +42,69 @@ public class OrdersController : ControllerBase
     [HttpPost]
     public IActionResult Create([FromBody] CreateOrderRequest request)
     {
-        if (request.TotalAmount <= 0)
+        var result = _orderService.Place(request);
+        if (result.IsFailure)
         {
-            return UnprocessableEntity(new ProblemDetails
+            var problemDetails = new ProblemDetails
             {
-                Type = "https://addiseats.et/errors/validation",
-                Title = "Invalid order amount",
-                Status = StatusCodes.Status422UnprocessableEntity,
-                Detail = "Order total amount must be a positive ETB amount."
-            });
+                Type = $"https://addiseats.et/errors/{result.Error.Code.ToLowerInvariant().Replace('_', '-')}",
+                Title = result.Error.Code,
+                Status = result.Error.StatusCode,
+                Detail = result.Error.Message
+            };
+
+            return StatusCode(result.Error.StatusCode, problemDetails);
         }
 
-        int nextId = _orders.Count > 0 ? _orders.Max(o => o.Id) + 1 : 1;
-        var order = new Order
-        {
-            Id = nextId,
-            RestaurantId = request.RestaurantId,
-            CustomerName = request.CustomerName,
-            TotalAmount = request.TotalAmount,
-            Status = OrderStatus.Pending,
-            SpecialInstructions = request.SpecialInstructions,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _orders.Add(order);
-
+        var order = result.Value!;
         return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
     }
 
     [HttpPatch("{id:int}/status")]
     public IActionResult UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request)
     {
-        var order = _orders.FirstOrDefault(o => o.Id == id);
-        if (order == null)
+        var result = _orderService.UpdateStatus(id, request.Status);
+        if (result.IsFailure)
         {
-            return NotFound();
+            var problemDetails = new ProblemDetails
+            {
+                Type = $"https://addiseats.et/errors/{result.Error.Code.ToLowerInvariant().Replace('_', '-')}",
+                Title = result.Error.Code,
+                Status = result.Error.StatusCode,
+                Detail = result.Error.Message
+            };
+
+            return StatusCode(result.Error.StatusCode, problemDetails);
         }
 
-        if (order.Status == OrderStatus.Delivered && request.Status == OrderStatus.Cancelled)
+        return Ok(result.Value);
+    }
+
+    [HttpGet("admin")]
+    public IActionResult GetAdminOrders([FromHeader(Name = "Authorization")] string? authorization)
+    {
+        if (string.IsNullOrWhiteSpace(authorization))
         {
-            return Conflict(new ProblemDetails
+            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetails
             {
-                Type = "https://addiseats.et/errors/conflict",
-                Title = "Cannot cancel delivered order",
-                Status = StatusCodes.Status409Conflict,
-                Detail = "This order has already been delivered and can no longer be modified or cancelled."
+                Type = "https://addiseats.et/errors/unauthorized",
+                Title = "UNAUTHORIZED",
+                Status = StatusCodes.Status401Unauthorized,
+                Detail = "You must be signed in to perform this request."
             });
         }
 
-        order.Status = request.Status;
-        return Ok(order);
+        if (!authorization.Contains("AdminToken", StringComparison.OrdinalIgnoreCase))
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/forbidden",
+                Title = "PERMISSION_DENIED",
+                Status = StatusCodes.Status403Forbidden,
+                Detail = "You do not have permission to perform this action."
+            });
+        }
+
+        return Ok(_orderService.GetAll());
     }
 }

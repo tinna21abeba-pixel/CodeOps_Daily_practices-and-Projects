@@ -1,6 +1,8 @@
 using AddisEats.Api.Filters;
+using AddisEats.Api.Middleware;
 using AddisEats.Api.Models;
 using AddisEats.Api.Services;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -10,6 +12,20 @@ builder.Services.Configure<DeliveryOptions>(builder.Configuration.GetSection("De
 builder.Services.AddControllers(options =>
     {
         options.Filters.Add<RejectUnknownQueryParamsFilter>();
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var problemDetails = new ValidationProblemDetails(context.ModelState)
+            {
+                Type = "https://addiseats.et/errors/validation-failed",
+                Title = "VALIDATION_FAILED",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "One or more fields in your request are invalid. Please check your submission and try again."
+            };
+            return new BadRequestObjectResult(problemDetails);
+        };
     })
     .AddJsonOptions(options =>
     {
@@ -21,6 +37,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddScoped<IClock, SystemClock>();
 builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddCors(options =>
 {
@@ -36,6 +53,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
