@@ -218,21 +218,13 @@ public static class SeedData
         new()
         {
             Id = 12,
-            Name = "Abay Megenagna",
-            Area = "Megenagna",
+            Name = "Effoi Pizza Sarbet",
+            Area = "Sarbet",
             DeliveryFeeEtb = 70m,
             OwnerPhone = "0911234578",
             CommissionRate = 0.14m,
-            IsActive = true,
-            Menu = new List<MenuItem>
-            {
-                new() { Id = 1201, RestaurantId = 12, Name = "Abay Special Tibs", Category = "Meat", Price = 360m, PriceWithVat = 414m },
-                new() { Id = 1202, RestaurantId = 12, Name = "Bozena Shiro", Category = "Traditional", Price = 240m, PriceWithVat = 276m },
-                new() { Id = 1203, RestaurantId = 12, Name = "Shiro Tegabino", Category = "Vegetarian", Price = 190m, PriceWithVat = 218.5m },
-                new() { Id = 1204, RestaurantId = 12, Name = "Gomen be Sega", Category = "Traditional", Price = 290m, PriceWithVat = 333.5m },
-                new() { Id = 1205, RestaurantId = 12, Name = "Mineral Water 500ml", Category = "Drinks", Price = 45m, PriceWithVat = 51.75m },
-                new() { Id = 1206, RestaurantId = 12, Name = "St. George Beer", Category = "Drinks", Price = 85m, PriceWithVat = 97.75m }
-            }
+            IsActive = false,
+            Menu = new List<MenuItem>()
         }
     };
 

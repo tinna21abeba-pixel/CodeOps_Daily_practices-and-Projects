@@ -1,14 +1,23 @@
+namespace AddisEats.Api.Services;
+
+using AddisEats.Api.Common;
 using AddisEats.Api.Data;
 using AddisEats.Api.Models;
-
-namespace AddisEats.Api.Services;
 
 public class RestaurantService : IRestaurantService
 {
     private readonly List<Restaurant> _all = SeedData.Restaurants;
 
-    public Restaurant? GetById(int id)
-        => _all.FirstOrDefault(r => r.Id == id);
+    public Result<Restaurant> GetById(int id)
+    {
+        var found = _all.FirstOrDefault(r => r.Id == id);
+        if (found is null)
+        {
+            return Result<Restaurant>.Failure(Error.RestaurantNotFound(id));
+        }
+
+        return Result<Restaurant>.Success(found);
+    }
 
     public IReadOnlyList<Restaurant> Search(RestaurantQuery query)
     {
@@ -29,7 +38,7 @@ public class RestaurantService : IRestaurantService
         }
 
         int page = query.Page < 1 ? 1 : query.Page;
-        int limit = query.Limit < 1 ? 20 : query.Limit;
+        int limit = query.Limit < 1 ? 20 : (query.Limit > 50 ? 50 : query.Limit);
 
         return result
             .OrderBy(r => r.Name)

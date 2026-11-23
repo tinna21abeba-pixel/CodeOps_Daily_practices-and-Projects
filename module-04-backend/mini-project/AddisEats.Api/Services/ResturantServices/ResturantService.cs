@@ -1,12 +1,7 @@
-using AddisEats.Api.Models;
-using AddisEats.Api.Services;
-
 namespace AddisEats.Api.ResturantServices;
 
-public class ResturantService : RestaurantService, IResturantService, IRestuarantService
-{
-}
+using AddisEats.Api.Services;
 
-public class RestuarantService : ResturantService
+public class ResturantService : RestaurantService, IResturantService, IRestuarantService
 {
 }

@@ -1,10 +1,11 @@
+namespace AddisEats.Api.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
-using AddisEats.Api.Models;
+using AddisEats.Api.Common;
 using AddisEats.Api.DTOs;
+using AddisEats.Api.Models;
 using AddisEats.Api.Services.MenuService;
 using Microsoft.Extensions.Options;
-
-namespace AddisEats.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/menu-items")]
@@ -42,20 +43,13 @@ public class MenuController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<MenuItem> GetById(int id)
     {
-        var item = _menuService.GetById(id);
-
-        if (item == null)
+        var result = _menuService.GetById(id);
+        if (result.IsFailure)
         {
-            return NotFound(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/not-found",
-                Title = "Menu item not found",
-                Status = StatusCodes.Status404NotFound,
-                Detail = $"Menu item with id {id} not found."
-            });
+            return ProblemDetailsHelper.CreateProblemResult(HttpContext, result.Error);
         }
 
-        return Ok(item);
+        return Ok(result.Value!);
     }
 
     [HttpPost]
@@ -64,42 +58,13 @@ public class MenuController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public ActionResult<MenuItem> Create([FromBody] CreateMenuItemRequest request)
     {
-        if (request == null)
+        var result = _menuService.Add(request);
+        if (result.IsFailure)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/validation",
-                Title = "Request body required",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Request body is required."
-            });
+            return ProblemDetailsHelper.CreateProblemResult(HttpContext, result.Error);
         }
 
-        if (request.Price <= 0m)
-        {
-            return UnprocessableEntity(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/unprocessable",
-                Title = "Invalid price",
-                Status = StatusCodes.Status422UnprocessableEntity,
-                Detail = "Price must be a positive ETB amount greater than zero."
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Name))
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/validation",
-                Title = "Item name required",
-                Status = StatusCodes.Status400BadRequest,
-                Detail = "Item name is required."
-            });
-        }
-
-        var createdItem = _menuService.Add(request);
-
-        return CreatedAtAction(nameof(GetById), new { id = createdItem.Id }, createdItem);
+        return CreatedAtAction(nameof(GetById), new { id = result.Value!.Id }, result.Value!);
     }
 
     [HttpDelete("{id:int}")]
@@ -107,16 +72,10 @@ public class MenuController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public IActionResult Delete(int id)
     {
-        var deleted = _menuService.Delete(id);
-        if (!deleted)
+        var result = _menuService.Delete(id);
+        if (result.IsFailure)
         {
-            return NotFound(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/not-found",
-                Title = "Menu item not found",
-                Status = StatusCodes.Status404NotFound,
-                Detail = $"Menu item with id {id} not found."
-            });
+            return ProblemDetailsHelper.CreateProblemResult(HttpContext, result.Error);
         }
 
         return NoContent();

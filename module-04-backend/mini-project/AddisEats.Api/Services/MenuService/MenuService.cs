@@ -1,9 +1,10 @@
-using AddisEats.Api.Data;
-using AddisEats.Api.Models;
-using AddisEats.Api.DTOs;
-using Microsoft.Extensions.Options;
-
 namespace AddisEats.Api.Services.MenuService;
+
+using AddisEats.Api.Common;
+using AddisEats.Api.Data;
+using AddisEats.Api.DTOs;
+using AddisEats.Api.Models;
+using Microsoft.Extensions.Options;
 
 public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuItemService
 {
@@ -70,20 +71,26 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
         }
     }
 
-    public MenuItem? GetById(int id)
+    public Result<MenuItem> GetById(int id)
     {
         lock (_menuItems)
         {
-            return _menuItems.FirstOrDefault(m => m.Id == id);
+            var item = _menuItems.FirstOrDefault(m => m.Id == id);
+            if (item == null)
+            {
+                return Result<MenuItem>.Failure(Error.MenuItemNotFound(id));
+            }
+
+            return Result<MenuItem>.Success(item);
         }
     }
 
-    public List<MenuItem> ForRestaurant(int restaurantId, string? category = null)
+    public Result<List<MenuItem>> ForRestaurant(int restaurantId, string? category = null)
     {
         var restaurant = SeedData.Restaurants.FirstOrDefault(r => r.Id == restaurantId);
         if (restaurant == null)
         {
-            return new List<MenuItem>();
+            return Result<List<MenuItem>>.Failure(Error.RestaurantNotFound(restaurantId));
         }
 
         var items = restaurant.Menu.AsEnumerable();
@@ -92,11 +99,21 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
             items = items.Where(m => m.Category.Equals(category.Trim(), StringComparison.OrdinalIgnoreCase));
         }
 
-        return items.ToList();
+        return Result<List<MenuItem>>.Success(items.ToList());
     }
 
-    public MenuItem Add(CreateMenuItemRequest request)
+    public Result<MenuItem> Add(CreateMenuItemRequest request)
     {
+        if (request.Price <= 0m)
+        {
+            return Result<MenuItem>.Failure(Error.AmountInvalid("Price must be a positive ETB amount greater than zero."));
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return Result<MenuItem>.Failure(Error.ValidationFailed("Item name is required."));
+        }
+
         lock (_menuItems)
         {
             int nextId = _menuItems.Count > 0 ? _menuItems.Max(m => m.Id) + 1 : 1;
@@ -114,12 +131,17 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
             };
 
             _menuItems.Add(item);
-            return item;
+            return Result<MenuItem>.Success(item);
         }
     }
 
-    public MenuItem Add(MenuItem item)
+    public Result<MenuItem> Add(MenuItem item)
     {
+        if (item.Price <= 0m)
+        {
+            return Result<MenuItem>.Failure(Error.AmountInvalid("Price must be a positive ETB amount greater than zero."));
+        }
+
         lock (_menuItems)
         {
             if (item.Id <= 0)
@@ -133,22 +155,22 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
             }
 
             _menuItems.Add(item);
-            return item;
+            return Result<MenuItem>.Success(item);
         }
     }
 
-    public bool Delete(int id)
+    public Result<bool> Delete(int id)
     {
         lock (_menuItems)
         {
             var item = _menuItems.FirstOrDefault(m => m.Id == id);
             if (item == null)
             {
-                return false;
+                return Result<bool>.Failure(Error.MenuItemNotFound(id));
             }
 
             _menuItems.Remove(item);
-            return true;
+            return Result<bool>.Success(true);
         }
     }
 }

@@ -1,11 +1,12 @@
+namespace AddisEats.Api.Controllers;
+
 using Microsoft.AspNetCore.Mvc;
-using AddisEats.Api.Models;
+using AddisEats.Api.Common;
 using AddisEats.Api.DTOs;
 using AddisEats.Api.Mappers;
+using AddisEats.Api.Models;
 using AddisEats.Api.Services;
 using AddisEats.Api.Services.MenuService;
-
-namespace AddisEats.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
@@ -22,6 +23,7 @@ public class RestaurantsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<RestaurantDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public ActionResult<PagedResponse<RestaurantDto>> GetAll([FromQuery] RestaurantQuery query)
     {
         var results = _service.Search(query)
@@ -36,19 +38,13 @@ public class RestaurantsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<RestaurantDto> GetOne(int id)
     {
-        var found = _service.GetById(id);
-        if (found is null)
+        var result = _service.GetById(id);
+        if (result.IsFailure)
         {
-            return NotFound(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/not-found",
-                Title = "Restaurant not found",
-                Status = StatusCodes.Status404NotFound,
-                Detail = $"Restaurant with id {id} not found."
-            });
+            return ProblemDetailsHelper.CreateProblemResult(HttpContext, result.Error);
         }
 
-        return Ok(found.ToDto());
+        return Ok(result.Value!.ToDto());
     }
 
     [HttpGet("{id:int}/menu")]
@@ -57,18 +53,13 @@ public class RestaurantsController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<List<MenuItemDto>> GetMenu(int id, [FromQuery] string? category)
     {
-        if (_service.GetById(id) is null)
+        var result = _menuService.ForRestaurant(id, category);
+        if (result.IsFailure)
         {
-            return NotFound(new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/not-found",
-                Title = "Restaurant not found",
-                Status = StatusCodes.Status404NotFound,
-                Detail = $"Restaurant with id {id} not found."
-            });
+            return ProblemDetailsHelper.CreateProblemResult(HttpContext, result.Error);
         }
 
-        var items = _menuService.ForRestaurant(id, category)
+        var items = result.Value!
             .Select(m => m.ToDto())
             .ToList();
 
