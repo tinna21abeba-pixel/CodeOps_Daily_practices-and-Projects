@@ -10,4 +10,5 @@ public interface IMenuService
     MenuItem Add(CreateMenuItemRequest request);
     MenuItem Add(MenuItem item);
     List<MenuItem> ForRestaurant(int restaurantId, string? category = null);
+    bool Delete(int id);
 }

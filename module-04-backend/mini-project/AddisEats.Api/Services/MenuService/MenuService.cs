@@ -136,4 +136,19 @@ public class MenuService : IMenuService, AddisEats.Api.MenuItemServices.IMenuIte
             return item;
         }
     }
+
+    public bool Delete(int id)
+    {
+        lock (_menuItems)
+        {
+            var item = _menuItems.FirstOrDefault(m => m.Id == id);
+            if (item == null)
+            {
+                return false;
+            }
+
+            _menuItems.Remove(item);
+            return true;
+        }
+    }
 }

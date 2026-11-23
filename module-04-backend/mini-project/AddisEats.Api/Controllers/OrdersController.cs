@@ -23,13 +23,19 @@ public class OrdersController : ControllerBase
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<Order> GetById(int id)
     {
         var order = _orders.FirstOrDefault(o => o.Id == id);
         if (order is null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/not-found",
+                Title = "Order not found",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"Order with id {id} not found."
+            });
         }
 
         return Ok(order);
@@ -37,17 +43,30 @@ public class OrdersController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(typeof(Order), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
     public ActionResult<Order> Create([FromBody] CreateOrderRequest request)
     {
         if (request is null)
         {
-            return BadRequest(new { message = "Request body is required." });
+            return BadRequest(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/validation",
+                Title = "Request body required",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Request body is required."
+            });
         }
 
         if (request.TotalAmount <= 0)
         {
-            return BadRequest(new { message = "TotalAmount must be greater than zero." });
+            return UnprocessableEntity(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/unprocessable",
+                Title = "Invalid order amount",
+                Status = StatusCodes.Status422UnprocessableEntity,
+                Detail = "TotalAmount must be greater than zero ETB."
+            });
         }
 
         int nextId = _orders.Count > 0 ? _orders.Max(o => o.Id) + 1 : 1;
@@ -69,14 +88,20 @@ public class OrdersController : ControllerBase
 
     [HttpPatch("{id:int}/status")]
     [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public ActionResult<Order> UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request)
     {
         var order = _orders.FirstOrDefault(o => o.Id == id);
         if (order is null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/not-found",
+                Title = "Order not found",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"Order with id {id} not found."
+            });
         }
 
         if (order.Status == OrderStatus.Delivered && request.Status == OrderStatus.Cancelled)

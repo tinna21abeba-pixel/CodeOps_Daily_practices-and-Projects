@@ -33,26 +33,39 @@ public class RestaurantsController : ControllerBase
 
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(RestaurantDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<RestaurantDto> GetOne(int id)
     {
         var found = _service.GetById(id);
         if (found is null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/not-found",
+                Title = "Restaurant not found",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"Restaurant with id {id} not found."
+            });
         }
 
         return Ok(found.ToDto());
     }
 
     [HttpGet("{id:int}/menu")]
+    [HttpGet("{id:int}/menu-items")]
     [ProducesResponseType(typeof(List<MenuItemDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<List<MenuItemDto>> GetMenu(int id, [FromQuery] string? category)
     {
         if (_service.GetById(id) is null)
         {
-            return NotFound();
+            return NotFound(new ProblemDetails
+            {
+                Type = "https://addiseats.et/errors/not-found",
+                Title = "Restaurant not found",
+                Status = StatusCodes.Status404NotFound,
+                Detail = $"Restaurant with id {id} not found."
+            });
         }
 
         var items = _menuService.ForRestaurant(id, category)
