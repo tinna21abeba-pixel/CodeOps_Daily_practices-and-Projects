@@ -1,3 +1,4 @@
+using AddisEats.Api.Auth;
 using AddisEats.Api.Filters;
 using AddisEats.Api.Middleware;
 using AddisEats.Api.Models;
@@ -12,6 +13,7 @@ builder.Services.Configure<DeliveryOptions>(builder.Configuration.GetSection("De
 builder.Services.AddControllers(options =>
     {
         options.Filters.Add<RejectUnknownQueryParamsFilter>();
+        options.Filters.Add<AuditActionFilter>();
     })
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -38,6 +40,11 @@ builder.Services.AddScoped<IClock, SystemClock>();
 builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IScopedRequestTracker, ScopedRequestTracker>();
+
+builder.Services.AddAuthentication("DemoBearer")
+    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, DemoBearerAuthenticationHandler>("DemoBearer", null);
+builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
@@ -54,6 +61,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseMiddleware<RequestTimingMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -66,7 +75,23 @@ app.UseHttpsRedirection();
 
 app.UseCors();
 
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<RequestTrackerMiddleware>();
+
+app.Map("/admin", adminApp =>
+{
+    adminApp.UseMiddleware<ApiKeyMiddleware>();
+    adminApp.Run(async context =>
+    {
+        await context.Response.WriteAsJsonAsync(new
+        {
+            Message = "Admin endpoint reached.",
+            CorrelationId = context.TraceIdentifier
+        });
+    });
+});
 
 app.MapControllers();
 

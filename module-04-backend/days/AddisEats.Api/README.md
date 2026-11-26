@@ -843,3 +843,189 @@ git commit -m "feat: add ExceptionMiddleware producing 500 with traceId and no s
 git add AddisEats.Api/README.md AddisEats.Api/Filters/RejectUnknownQueryParamsFilter.cs AddisEats.Api/Controllers/PaymentController.cs AddisEats.Api/Controllers/RestaurantsController.cs
 git commit -m "docs: produce all catalogue codes from real requests and record responses in README"
 ```
+
+
+---
+
+# Addis Eats API - Day 59 Exercises
+
+## Exercise 1 - CorrelationIdMiddleware
+
+Implemented `Middleware/CorrelationIdMiddleware.cs`:
+- Reads `X-Correlation-Id` from incoming request headers; if missing or whitespace, generates a new 32-character hex GUID (`Guid.NewGuid().ToString("N")`).
+- Sets `context.TraceIdentifier = correlationId`.
+- Writes `X-Correlation-Id` back onto `context.Response.Headers`.
+- Wraps downstream execution in `_logger.BeginScope(...)` with `CorrelationId`.
+
+### Verification
+- **With incoming header (`X-Correlation-Id: req-addis-42`)**:
+  - `GET /api/v1/restaurants?area=Bole` returned HTTP `200` with response header `X-Correlation-Id: req-addis-42`.
+- **Without incoming header**:
+  - `GET /api/v1/health/error` generated and returned response header `X-Correlation-Id: a9b6fab2ff4d48469555d26209b58702` alongside the `500` error payload.
+
+---
+
+## Exercise 2 - RequestTimingMiddleware
+
+Implemented `Middleware/RequestTimingMiddleware.cs`:
+- Measures downstream request duration using `Stopwatch.StartNew()` inside a `try / finally` block.
+- Logs HTTP method, request path, response status code, elapsed milliseconds, and `context.TraceIdentifier` (`CorrelationId`).
+- Uses `LogLevel.Warning` when `elapsedMs > 1000`, and `LogLevel.Information` otherwise.
+
+### Verification
+- Fast request (`GET /api/v1/restaurants` -> 105 ms) logged at `info`:
+```text
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      HTTP GET /api/v1/restaurants responded 200 in 105 ms [CorrelationId: req-addis-42]
+```
+- Slow request (`GET /api/v1/health/concurrency?tag=terminal-1&delayMs=1500` -> 1527 ms) logged at `warn`:
+```text
+warn: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      HTTP GET /api/v1/health/concurrency responded 200 in 1527 ms [CorrelationId: 11f7e66bd6734e48ae40adb3a8b9bb17]
+```
+
+---
+
+## Exercise 3 - Pipeline Registration & Correlation ID Inside Timing Log
+
+Registered `CorrelationIdMiddleware` first and `RequestTimingMiddleware` immediately second in `Program.cs` (before `ExceptionMiddleware` and all downstream middleware):
+1. `CorrelationIdMiddleware` populates `context.TraceIdentifier` before any downstream component executes.
+2. `RequestTimingMiddleware` wraps `ExceptionMiddleware`, so even unhandled exceptions that result in a `500` status code have their final status, timing, and correlation ID accurately logged.
+
+### Confirmation
+Log line with custom correlation ID `req-addis-42`:
+```text
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      HTTP GET /api/v1/restaurants responded 200 in 105 ms [CorrelationId: req-addis-42]
+```
+Log line on unhandled exception (`500`) with generated correlation ID:
+```text
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      HTTP GET /api/v1/health/error responded 500 in 66 ms [CorrelationId: a9b6fab2ff4d48469555d26209b58702]
+```
+
+---
+
+## Exercise 4 - ApiKeyMiddleware on `/admin` Branch via `Map`
+
+Implemented `Middleware/ApiKeyMiddleware.cs` and branched `/admin` in `Program.cs` using `app.Map("/admin", ...)`:
+- Checks for `X-Api-Key` header; if missing or whitespace, immediately short-circuits with `401 Unauthorized` and an `application/problem+json` body.
+- Applied exclusively inside `app.Map("/admin", ...)` so standard API routes (`/api/v1/restaurants`, `/api/v1/health`, etc.) are unaffected.
+
+### Verification
+- **`GET /admin` without `X-Api-Key`:**
+  - Status: `401`
+  - Body: `{"type":"https://addiseats.et/errors/unauthorized","title":"UNAUTHORIZED","status":401,"detail":"Missing required 'X-Api-Key' header."}`
+- **`GET /admin` with `X-Api-Key: addis-secret-key`:**
+  - Status: `200`
+  - Body: `{"message":"Admin endpoint reached.","correlationId":"0018f0b9fdf2433cab964b113230238a"}`
+
+---
+
+## Exercise 5 - Scoped Service in Convention Middleware Constructor vs `InvokeAsync`
+
+Created `IScopedRequestTracker` / `ScopedRequestTracker` (registered via `AddScoped`), `RequestTrackerMiddleware`, and `GET /api/v1/health/concurrency?tag=...&delayMs=...`.
+
+### Part 1: Injected into Convention Middleware Constructor (Buggy)
+1. **In `Development` (`ValidateScopes = true`)**: The app fails immediately at startup because convention middleware is constructed once from the root DI container:
+```text
+System.InvalidOperationException: Cannot resolve scoped service 'AddisEats.Api.Services.IScopedRequestTracker' from root provider.
+```
+2. **In `Production` (`--no-launch-profile`, `ValidateScopes = false`)**: The app starts and captures a single `ScopedRequestTracker` instance inside `RequestTrackerMiddleware` for the lifetime of the application (captive dependency). Calling `/api/v1/health/concurrency` concurrently from two terminals (`terminal-1` with `delayMs=1500` followed 300ms later by `terminal-2` with `delayMs=100`) produced:
+```text
+Terminal 1: {"middlewareInstanceId":"1c91332f-eaf6-4988-9b2a-01984e9e6492","controllerInstanceId":"933c8729-fee4-4997-88c6-9ca0c123f929","requestedTag":"terminal-1","tagOnEntry":"terminal-1","tagAfterDelay":"terminal-2"}
+Terminal 2: {"middlewareInstanceId":"1c91332f-eaf6-4988-9b2a-01984e9e6492","controllerInstanceId":"aafe9d4a-8a03-4c27-9d75-6d0f5a896e90","requestedTag":"terminal-2","tagOnEntry":"terminal-2","tagAfterDelay":"terminal-2"}
+```
+**Observed Bug:** Both concurrent requests shared the exact same `middlewareInstanceId` (`1c91332f-eaf6-4988-9b2a-01984e9e6492`), different from each request's `controllerInstanceId`, and Terminal 2 overwrote `Tag` to `"terminal-2"` while Terminal 1 was awaiting its delay (`tagOnEntry: "terminal-1"`, `tagAfterDelay: "terminal-2"`).
+
+### Part 2: Moved to `InvokeAsync(HttpContext context, IScopedRequestTracker tracker)` (Fixed)
+Moving `IScopedRequestTracker` from the constructor into `InvokeAsync` resolves a fresh scoped instance from `context.RequestServices` on each request:
+```text
+Terminal 1: {"middlewareInstanceId":"c8475526-7f9b-4db8-954c-0626fb6170db","controllerInstanceId":"c8475526-7f9b-4db8-954c-0626fb6170db","requestedTag":"terminal-1","tagOnEntry":"terminal-1","tagAfterDelay":"terminal-1"}
+Terminal 2: {"middlewareInstanceId":"14840c50-f924-427e-83cf-4da16fcb9af9","controllerInstanceId":"14840c50-f924-427e-83cf-4da16fcb9af9","requestedTag":"terminal-2","tagOnEntry":"terminal-2","tagAfterDelay":"terminal-2"}
+```
+**Observed Fix:** Starts cleanly in `Development`, each concurrent request receives its own isolated scoped instance (`middlewareInstanceId == controllerInstanceId`), and `tagAfterDelay` remains uncorrupted.
+
+---
+
+## Exercise 6 - `UseAuthorization` Above `UseAuthentication`
+
+Configured `DemoBearerAuthenticationHandler` (`DemoBearer` scheme) and added `[Authorize]` endpoint `GET /api/v1/health/protected`.
+
+- **Correct order (`UseAuthentication` before `UseAuthorization`)**:
+  - `GET /api/v1/health/protected` with `Authorization: Bearer AdminToken` returns `200 OK`: `{"user":"AddisEatsUser","authenticated":true}`.
+- **Swapped order (`UseAuthorization` above `UseAuthentication` in scratch experiment)**:
+  - Calling `GET /api/v1/health/protected` with `Authorization: Bearer AdminToken` and `X-Correlation-Id: ex6-swapped-order` fails because `UseAuthorization` evaluates an unauthenticated `HttpContext.User` before `UseAuthentication` parses the bearer header.
+  - **Exact Response:**
+    - Status: `401`
+    - Headers: `{'Content-Length': '0', 'Connection': 'close', 'Date': 'Thu, 26 Nov 2026 13:53:20 GMT', 'Server': 'Kestrel', 'X-Correlation-Id': 'ex6-swapped-order'}`
+    - Body: `''` (empty)
+  - **Exact Log Output:**
+```text
+info: AddisEats.Api.Auth.DemoBearerAuthenticationHandler[12]
+      AuthenticationScheme: DemoBearer was challenged.
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      HTTP GET /api/v1/health/protected responded 401 in 12 ms [CorrelationId: ex6-swapped-order]
+```
+
+---
+
+## Exercise 7 - AuditActionFilter
+
+Implemented `Filters/AuditActionFilter.cs` (`IActionFilter`) registered globally in `AddControllers`, logging the resolved `ActionDescriptor.DisplayName` and JSON-serialized `ActionArguments` dictionary in `OnActionExecuting`:
+```text
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      Audit: Executing AddisEats.Api.Controllers.RestaurantsController.Search (AddisEats.Api) with arguments {"query":{"Area":"Bole","Areas":null,"Name":null,"MaxFeeEtb":null,"Page":1,"Limit":10}}
+```
+
+### One-line Explanation
+This could not be middleware because middleware runs outside MVC action invocation before model binding completes and therefore has no access to the resolved `ActionDescriptor` or bound C# `ActionArguments`.
+
+---
+
+## Exercise 8 - Final `Program.cs` Pipeline (Line-by-Line)
+
+| Line(s) | Statement | Reason for Position |
+|---|---|---|
+| 64 | `app.UseMiddleware<CorrelationIdMiddleware>();` | Must run first so `HttpContext.TraceIdentifier`, the `X-Correlation-Id` response header, and the logging scope exist for every subsequent middleware, error handler, and timing log. |
+| 65 | `app.UseMiddleware<RequestTimingMiddleware>();` | Placed immediately after correlation ID assignment and outside `ExceptionMiddleware` so it measures total request latency and records the final status code (including `500`s) with the correlation ID already populated. |
+| 66 | `app.UseMiddleware<ExceptionMiddleware>();` | Wraps all Swagger, routing, auth, branched, and controller middleware so any unhandled downstream exception is caught and formatted as `500` `ProblemDetails` while keeping the timing and correlation middleware intact outside it. |
+| 68-72 | `if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }` | Exposes OpenAPI JSON and Swagger UI only in `Development` and before HTTPS redirection/auth so local documentation loads without requiring API authentication. |
+| 74 | `app.UseHttpsRedirection();` | Redirects plain HTTP requests to HTTPS early in the pipeline before CORS, auth, and endpoint execution. |
+| 76 | `app.UseCors();` | Runs before authentication, authorization, and terminal endpoints so CORS headers and preflight `OPTIONS` responses are applied even when auth or downstream middleware short-circuits. |
+| 78 | `app.UseAuthentication();` | Must run before `UseAuthorization` so incoming credentials (such as `Authorization: Bearer ...`) are validated and `HttpContext.User` is populated before authorization checks execute. |
+| 79 | `app.UseAuthorization();` | Runs immediately after `UseAuthentication` and before endpoint execution (`MapControllers`) so `[Authorize]` policies evaluate the populated `ClaimsPrincipal` and reject unauthorized requests before controller code runs. |
+| 81 | `app.UseMiddleware<RequestTrackerMiddleware>();` | Runs after routing/auth middleware and before controller execution so per-request scoped state is initialized inside `InvokeAsync` only for requests that proceed toward MVC endpoints. |
+| 83-94 | `app.Map("/admin", adminApp => { ... });` | Branches `/admin` requests into an isolated sub-pipeline protected by `ApiKeyMiddleware` after shared cross-cutting concerns (correlation ID, timing, exceptions, CORS) have run, without affecting `MapControllers` routes. |
+| 96 | `app.MapControllers();` | Terminal endpoint middleware that dispatches matched controller actions and executes MVC filters (`RejectUnknownQueryParamsFilter`, `AuditActionFilter`) after all pipeline middleware has run. |
+| 98 | `app.Run();` | Starts the Kestrel web host and begins listening for incoming HTTP requests with the configured pipeline. |
+
+---
+
+## Git Commit Mapping (One Commit Each)
+
+```bash
+git add AddisEats.Api/Middleware/CorrelationIdMiddleware.cs
+git commit -m "feat: add CorrelationIdMiddleware setting TraceIdentifier and X-Correlation-Id header"
+
+git add AddisEats.Api/Middleware/RequestTimingMiddleware.cs
+git commit -m "feat: add RequestTimingMiddleware logging method, path, status and Warning above 1000ms"
+
+git add AddisEats.Api/Program.cs
+git commit -m "feat: register CorrelationIdMiddleware and RequestTimingMiddleware in pipeline"
+
+git add AddisEats.Api/Middleware/ApiKeyMiddleware.cs AddisEats.Api/Program.cs
+git commit -m "feat: add ApiKeyMiddleware returning 401 when header missing on /admin Map branch"
+
+git add AddisEats.Api/Services/IScopedRequestTracker.cs AddisEats.Api/Services/ScopedRequestTracker.cs AddisEats.Api/Middleware/RequestTrackerMiddleware.cs AddisEats.Api/Controllers/HealthController.cs AddisEats.Api/Program.cs
+git commit -m "fix: move scoped service injection from convention middleware constructor to InvokeAsync"
+
+git add AddisEats.Api/Auth/DemoBearerAuthenticationHandler.cs AddisEats.Api/Controllers/HealthController.cs AddisEats.Api/Program.cs
+git commit -m "feat: add DemoBearer auth and protected endpoint verifying UseAuthentication before UseAuthorization"
+
+git add AddisEats.Api/Filters/AuditActionFilter.cs AddisEats.Api/Program.cs
+git commit -m "feat: add AuditActionFilter logging action name and bound arguments"
+
+git add AddisEats.Api/README.md
+git commit -m "docs: record middleware experiments and line-by-line Program.cs pipeline in README"
+```
