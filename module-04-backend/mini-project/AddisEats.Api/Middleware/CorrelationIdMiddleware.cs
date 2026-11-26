@@ -1,4 +1,4 @@
-```csharp
+
 using Microsoft.AspNetCore.Http;
 
 namespace AddisEats.Api.Middleware;

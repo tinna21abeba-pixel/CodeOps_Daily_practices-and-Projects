@@ -30,7 +30,27 @@ Accept: application/json
 
 ###
 
+GET {{host}}/api/v1/restaurants/999
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants?unexpectedParam=test
+Accept: application/json
+
+###
+
 GET {{host}}/api/v1/restaurants/1/menu-items
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/restaurants/999/menu-items
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/orders
 Accept: application/json
 
 ###
@@ -40,7 +60,12 @@ Accept: application/json
 
 ###
 
-GET {{host}}/api/v1/orders/invalid-id
+GET {{host}}/api/v1/orders/abc
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/orders/999
 Accept: application/json
 
 ###
@@ -51,9 +76,89 @@ Accept: application/json
 
 {
   "restaurantId": 1,
-  "customerName": "Tadesse Belay",
-  "totalAmount": 380.00,
-  "specialInstructions": null
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Cameroon St, Bole",
+  "isDelivery": true,
+  "items": [
+    {
+      "menuItemId": 101,
+      "quantity": 1
+    }
+  ],
+  "totalAmount": 1.00,
+  "totalEtb": 1.00
+}
+
+###
+
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 0,
+  "customerName": "A",
+  "customerPhone": "12345",
+  "items": []
+}
+
+###
+
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 1,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "isDelivery": true,
+  "deliveryAddress": "",
+  "items": [
+    {
+      "menuItemId": 101,
+      "quantity": 1
+    }
+  ]
+}
+
+###
+
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 12,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Sarbet",
+  "items": [
+    {
+      "menuItemId": 1,
+      "quantity": 1
+    }
+  ]
+}
+
+###
+
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "restaurantId": 1,
+  "customerName": "Abebe Kebede",
+  "customerPhone": "+251911234567",
+  "deliveryAddress": "Cameroon St, Bole",
+  "items": [
+    {
+      "menuItemId": 999,
+      "quantity": 1
+    }
+  ]
 }
 
 ###
@@ -68,12 +173,58 @@ Accept: application/json
 
 ###
 
-PATCH {{host}}/api/v1/orders/1/status
+PATCH {{host}}/api/v1/orders/2/status
 Content-Type: application/json
 Accept: application/json
 
 {
   "status": "Cancelled"
+}
+
+###
+
+GET {{host}}/api/v1/orders/admin
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/orders/admin
+Authorization: Bearer CourierToken123
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/orders/admin
+Authorization: Bearer AdminTokenSecure
+Accept: application/json
+
+###
+
+POST {{host}}/api/v1/payment
+Content-Type: application/json
+Accept: application/json
+
+{
+  "provider": "TeleBirr",
+  "amount": 999999.00,
+  "phone": "+251911234567"
+}
+
+###
+
+GET {{host}}/api/v1/payment?amount=999999
+Accept: application/json
+
+###
+
+POST {{host}}/api/v1/payment
+Content-Type: application/json
+Accept: application/json
+
+{
+  "provider": "TeleBirr",
+  "amount": 500.00,
+  "phone": "+251911234567"
 }
 
 ###
@@ -84,6 +235,11 @@ Accept: application/json
 ###
 
 GET {{host}}/api/v1/menu-items/1
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/menu-items/999
 Accept: application/json
 
 ###
@@ -100,7 +256,32 @@ Accept: application/json
 
 ###
 
+POST {{host}}/api/v1/menu-items
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "",
+  "category": "",
+  "price": -10.00
+}
+
+###
+
 DELETE {{host}}/api/v1/menu-items/3
 Accept: application/json
 
 ###
+
+DELETE {{host}}/api/v1/menu-items/999
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/health
+Accept: application/json
+
+###
+
+GET {{host}}/api/v1/health/error
+Accept: application/json
