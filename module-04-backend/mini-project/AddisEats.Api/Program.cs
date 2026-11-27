@@ -74,18 +74,25 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options=>{
-    options.SwaggerDoc("v1",new OpenApiInfo
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
-        Title = "AddisEats API",
-        Description = "AddisEats API",
+        Title = "Addis Eats API",
+        Description = "REST API for Addis Eats restaurant discovery, menu browsing, server-priced order placement, and Ethiopian mobile payments.",
         TermsOfService = new Uri("https://addiseats.et/terms"),
-       
+        Contact = new OpenApiContact
+        {
+            Name = "Addis Eats Engineering",
+            Email = "api@addiseats.et",
+            Url = new Uri("https://addiseats.et")
+        }
     });
-var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-options.IncludeXmlComments(xmlPath);
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
 
 var app = builder.Build();

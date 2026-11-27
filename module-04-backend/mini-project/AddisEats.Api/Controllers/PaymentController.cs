@@ -5,7 +5,11 @@ using AddisEats.Api.Common;
 using AddisEats.Api.DTOs;
 using AddisEats.Api.Services;
 
+/// <summary>
+/// Processes Ethiopian mobile money payments (TeleBirr and CBE Birr).
+/// </summary>
 [ApiController]
+[Tags("Payments")]
 [Route("api/v1/payment")]
 public class PaymentController : ControllerBase
 {
@@ -16,11 +20,19 @@ public class PaymentController : ControllerBase
         _paymentService = paymentService;
     }
 
+    /// <summary>
+    /// Processes a mobile money payment for an order.
+    /// </summary>
+    /// <param name="request">The payment request payload containing provider, ETB amount, and customer mobile number.</param>
+    /// <returns>The settled payment confirmation.</returns>
+    /// <response code="200">Payment processed successfully.</response>
+    /// <response code="400">One or more payment request fields failed validation.</response>
+    /// <response code="402">Payment was declined by the provider (for example, exceeding transaction limits).</response>
     [HttpPost]
     [Route("")]
     [Route("/api/v1/orders/{orderId:int}/payments")]
     [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status402PaymentRequired)]
     public IActionResult Process([FromBody] PaymentRequest request)
     {
@@ -33,8 +45,17 @@ public class PaymentController : ControllerBase
         return Ok(result.Value!);
     }
 
+    /// <summary>
+    /// Simulates a TeleBirr payment using a query-supplied ETB amount.
+    /// </summary>
+    /// <param name="amount">Payment amount in Ethiopian Birr (ETB).</param>
+    /// <returns>The simulated payment confirmation.</returns>
+    /// <response code="200">Payment processed successfully.</response>
+    /// <response code="400">Invalid amount query parameter or unknown query key.</response>
+    /// <response code="402">Payment declined because the amount is non-positive or exceeds 50,000 ETB.</response>
     [HttpGet]
     [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status402PaymentRequired)]
     public IActionResult ProcessQuery([FromQuery] decimal amount)
     {
