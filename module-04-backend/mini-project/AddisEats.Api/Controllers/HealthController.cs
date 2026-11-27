@@ -21,4 +21,17 @@ public class HealthController : ControllerBase
     {
         throw new InvalidOperationException("Deliberate unhandled exception for middleware verification.");
     }
+
+    [HttpGet("slow")]
+    public async Task<IActionResult> Slow([FromQuery] int delayMs = 1100)
+    {
+        var boundedDelay = Math.Clamp(delayMs, 0, 5000);
+        await Task.Delay(boundedDelay);
+        return Ok(new
+        {
+            status = "SlowHealthy",
+            delayMs = boundedDelay,
+            timestamp = DateTime.UtcNow
+        });
+    }
 }

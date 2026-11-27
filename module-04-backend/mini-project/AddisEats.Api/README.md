@@ -450,3 +450,216 @@ Calculation Breakdown: Doro Wat (450.00 ETB) + Delivery Fee (50.00 ETB) = 500.00
 - [x] A field-level failure reports every invalid field at once.
 - [x] A business-rule failure returns a Result rather than throwing.
 - [x] No stack trace or exception message appears in any response.
+
+---
+
+## Week 12 Capstone — Middleware Pipeline, Action Filter & Ordering Verification
+
+### Added Components
+
+#### 1. Custom Middleware (Zero Scoped Constructor Dependencies)
+Middleware in ASP.NET Core is constructed **once per application lifetime** (effectively singleton). Injecting a scoped service directly into a middleware constructor causes a captive-dependency runtime error (`InvalidOperationException` under scope validation). All middleware constructors in `Middleware/` inject only singleton-safe framework services:
+
+| Middleware | File | Constructor Dependencies | Responsibility |
+|---|---|---|---|
+| `CorrelationIdMiddleware` | `Middleware/CorrelationIdMiddleware.cs` | `RequestDelegate`, `ILogger<CorrelationIdMiddleware>` | Reads `X-Correlation-ID` (accepting sane values `<= 64` chars) or generates a 32-char hex GUID; stores it in `HttpContext.Items["CorrelationId"]` and `HttpContext.TraceIdentifier`; writes `X-Correlation-ID` to every response via `Response.OnStarting(...)` (even on `401` short-circuits or `500` exceptions); opens `_logger.BeginScope("CorrelationId:{CorrelationId}", id)` for all downstream logs. |
+| `RequestTimingMiddleware` | `Middleware/RequestTimingMiddleware.cs` | `RequestDelegate`, `ILogger<RequestTimingMiddleware>` | Starts a `Stopwatch` before `await _next(context)` and logs `{Method}`, `{Path}`, `{StatusCode}`, and `{Duration}ms` in a `finally` block. Emits `LogWarning` when `duration >= 1000ms` (`WarningThresholdMs = 1000`), otherwise `LogInformation`. |
+| `ExceptionMiddleware` | `Middleware/ExceptionMiddleware.cs` | `RequestDelegate`, `ILogger<ExceptionMiddleware>` | Catches unhandled exceptions from downstream middleware, filters, and controllers; logs the exception with `TraceId`; returns RFC 7807 `ProblemDetails` (`500`). |
+| `ApiKeyMiddleware` | `Middleware/ApiKeyMiddleware.cs` | `RequestDelegate`, `IConfiguration`, `ILogger<ApiKeyMiddleware>` | Mounted inside an `app.Map("/api/v1/partner", ...)` branch. Validates `X-API-Key` against `Configuration["ApiKey"]` (`addis-eats-secret` in `appsettings.json`). Short-circuits with `401 Unauthorized` without calling `_next(context)` when missing/invalid. |
+
+> **Console Log Scopes:** `appsettings.json` enables `"Logging": { "Console": { "IncludeScopes": true } }` so the `CorrelationId` scope opened by `CorrelationIdMiddleware` prints on every downstream log line.
+
+#### 2. Audit Action Filter (`Filters/AuditActionFilter.cs`)
+- Implements `IAsyncActionFilter` (registered globally alongside `RejectUnknownQueryParamsFilter` in `Program.cs` via `AddControllers`).
+- Runs **only** when MVC routing selects a controller action (after middleware, routing, and model binding). It does **not** run on `Map` branch requests (`/api/v1/partner`) or middleware short-circuits.
+- Logs:
+  - `Audit [START]`: controller/action name, HTTP method, path, bound parameter names (omitting sensitive values), and `CorrelationId`.
+  - `Audit [END]`: controller/action name, resolved HTTP status code, and `CorrelationId`.
+  - `Audit [EXCEPTION]`: logged at `Warning` level if the action throws an unhandled exception before `ExceptionMiddleware` catches it.
+
+---
+
+### Canonical Pipeline Order (`Program.cs`)
+
+```text
+Incoming Request
+  │
+  ├─► 1. CorrelationIdMiddleware      (assigns/echoes X-Correlation-ID, OnStarting header, BeginScope)
+  ├─► 2. RequestTimingMiddleware      (Stopwatch + try/finally; captures final status & slow >= 1000ms warning)
+  ├─► 3. ExceptionMiddleware          (global catch -> RFC 7807 500 ProblemDetails)
+  ├─► 4. UseSwagger / UseSwaggerUI    (Development only)
+  ├─► 5. UseHttpsRedirection
+  ├─► 6. UseRouting
+  ├─► 7. UseCors("frontend")
+  ├─► 8. // app.UseRateLimiter();     (future: positioned after routing/CORS, before auth)
+  ├─► 9. // app.UseAuthentication();  (future: establishes caller identity before authorization)
+  ├─► 10. // app.UseAuthorization();  (future: enforces policies after identity is established)
+  ├─► 11. app.Map("/api/v1/partner")  ──► ApiKeyMiddleware (401 short-circuit or 200 branch handler)
+  └─► 12. app.MapControllers()        ──► Action Filters (RejectUnknownQueryParamsFilter, AuditActionFilter) ──► Controllers
+```
+
+---
+
+### Pipeline Log Verification (Correct vs. Deliberately Reordered)
+
+Both runs executed the exact same 5 HTTP requests:
+1. `GET /api/v1/restaurants?page=1&limit=2` (no `X-Correlation-ID` header — server generates one)
+2. `GET /api/v1/health/slow?delayMs=1100` (with `X-Correlation-ID` — triggers `>= 1000ms` Warning threshold)
+3. `GET /api/v1/health/error` (with `X-Correlation-ID` — triggers unhandled exception -> `500`)
+4. `GET /api/v1/partner` (without `X-API-Key` — `ApiKeyMiddleware` short-circuits `401`)
+5. `GET /api/v1/partner` (with `X-API-Key: addis-eats-secret` — `200 OK`)
+
+#### A. Correct Canonical Pipeline Output
+
+HTTP Responses:
+```text
+=== 1. Normal controller request (no X-Correlation-ID) ===
+HTTP 200 | X-Correlation-ID: 7a79f7733aec41c297ec5b46288b0a64
+
+=== 2. Slow request (>= 1000ms -> Warning) ===
+HTTP 200 | X-Correlation-ID: canonical-slow-002
+
+=== 3. Error request (500 ProblemDetails) ===
+HTTP 500 | X-Correlation-ID: canonical-err-003
+
+=== 4. Partner Map branch without X-API-Key (401 short-circuit) ===
+HTTP 401 | X-Correlation-ID: canonical-partner-401
+{"message":"Invalid or missing API key."}
+
+=== 5. Partner Map branch with valid X-API-Key (200 OK) ===
+HTTP 200 | X-Correlation-ID: canonical-partner-200
+{"service":"AddisEats Partner Branch","status":"Authorized","correlationId":"canonical-partner-200","timestamp":"2026-11-26T18:29:36.5414253Z"}
+```
+
+Server Console Logs:
+```text
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/restaurants ... => CorrelationId:7a79f7733aec41c297ec5b46288b0a64 => AddisEats.Api.Controllers.RestaurantsController.GetAll (ADdisEAts.Api)
+      Audit [START]: Restaurants.GetAll | GET /api/v1/restaurants | Params: [query] | CorrelationId: 7a79f7733aec41c297ec5b46288b0a64
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/restaurants ... => CorrelationId:7a79f7733aec41c297ec5b46288b0a64 => AddisEats.Api.Controllers.RestaurantsController.GetAll (ADdisEAts.Api)
+      Audit [END]: Restaurants.GetAll | GET /api/v1/restaurants | Status: 200 | CorrelationId: 7a79f7733aec41c297ec5b46288b0a64
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => ... => RequestPath:/api/v1/restaurants ... => CorrelationId:7a79f7733aec41c297ec5b46288b0a64
+      Request: GET /api/v1/restaurants | Status: 200 | Duration: 136ms
+
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/health/slow ... => CorrelationId:canonical-slow-002 => AddisEats.Api.Controllers.HealthController.Slow (ADdisEAts.Api)
+      Audit [START]: Health.Slow | GET /api/v1/health/slow | Params: [delayMs] | CorrelationId: canonical-slow-002
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/health/slow ... => CorrelationId:canonical-slow-002 => AddisEats.Api.Controllers.HealthController.Slow (ADdisEAts.Api)
+      Audit [END]: Health.Slow | GET /api/v1/health/slow | Status: 200 | CorrelationId: canonical-slow-002
+warn: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => ... => RequestPath:/api/v1/health/slow ... => CorrelationId:canonical-slow-002
+      Slow request: GET /api/v1/health/slow | Status: 200 | Duration: 1161ms
+
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/health/error ... => CorrelationId:canonical-err-003 => AddisEats.Api.Controllers.HealthController.DeliberateError (ADdisEAts.Api)
+      Audit [START]: Health.DeliberateError | GET /api/v1/health/error | Params: [none] | CorrelationId: canonical-err-003
+warn: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/health/error ... => CorrelationId:canonical-err-003 => AddisEats.Api.Controllers.HealthController.DeliberateError (ADdisEAts.Api)
+      Audit [EXCEPTION]: Health.DeliberateError | GET /api/v1/health/error | Exception: InvalidOperationException | CorrelationId: canonical-err-003
+fail: AddisEats.Api.Middleware.ExceptionMiddleware[0]
+      => ... => RequestPath:/api/v1/health/error ... => CorrelationId:canonical-err-003
+      Unhandled exception occurred. TraceId: 00-a0e2d3a0a921a7ce228b8c12f1f4ae5d-13c1ba67f378c214-00
+      System.InvalidOperationException: Deliberate unhandled exception for middleware verification.
+         ...
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => ... => RequestPath:/api/v1/health/error ... => CorrelationId:canonical-err-003
+      Request: GET /api/v1/health/error | Status: 500 | Duration: 181ms
+
+warn: AddisEats.Api.Middleware.ApiKeyMiddleware[0]
+      => ... => RequestPath:/api/v1/partner ... => CorrelationId:canonical-partner-401
+      ApiKeyMiddleware short-circuited GET /api/v1/partner with 401 (invalid or missing X-API-Key).
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => ... => RequestPath:/api/v1/partner ... => CorrelationId:canonical-partner-401
+      Request: GET /api/v1/partner | Status: 401 | Duration: 21ms
+
+info: AddisEats.Api.Middleware.ApiKeyMiddleware[0]
+      => ... => RequestPath:/api/v1/partner ... => CorrelationId:canonical-partner-200
+      ApiKeyMiddleware verified X-API-Key for GET /api/v1/partner; forwarding to branch handler.
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => ... => RequestPath:/api/v1/partner ... => CorrelationId:canonical-partner-200
+      Request: GET /api/v1/partner | Status: 200 | Duration: 23ms
+```
+
+#### B. Deliberately Reordered Pipeline Output
+
+To verify the impact of middleware ordering, the pipeline was temporarily reordered to:
+1. `app.Map("/api/v1/partner", ...)` **first** (before `CorrelationIdMiddleware` and `RequestTimingMiddleware`)
+2. `ExceptionMiddleware` **second** (before `RequestTimingMiddleware` and `CorrelationIdMiddleware`)
+3. `RequestTimingMiddleware` **third** (inside `ExceptionMiddleware`, and before `CorrelationIdMiddleware`)
+4. `CorrelationIdMiddleware` **fourth**
+
+HTTP Responses:
+```text
+=== 1. Normal controller request (no X-Correlation-ID) ===
+HTTP 200 | X-Correlation-ID: b828417ce68c411ca7cb17a46df1abd5
+
+=== 2. Slow request (>= 1000ms -> Warning) ===
+HTTP 200 | X-Correlation-ID: reordered-slow-002
+
+=== 3. Error request (500 ProblemDetails) ===
+HTTP 500 | X-Correlation-ID: reordered-err-003
+
+=== 4. Partner Map branch without X-API-Key (401 short-circuit) ===
+HTTP 401 | X-Correlation-ID: None
+{"message":"Invalid or missing API key."}
+
+=== 5. Partner Map branch with valid X-API-Key (200 OK) ===
+HTTP 200 | X-Correlation-ID: None
+{"service":"AddisEats Partner Branch","status":"Authorized","correlationId":null,"timestamp":"2026-11-27T05:46:39.5841946Z"}
+```
+
+Server Console Logs:
+```text
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/restaurants ... => CorrelationId:b828417ce68c411ca7cb17a46df1abd5 => AddisEats.Api.Controllers.RestaurantsController.GetAll (ADdisEAts.Api)
+      Audit [START]: Restaurants.GetAll | GET /api/v1/restaurants | Params: [query] | CorrelationId: b828417ce68c411ca7cb17a46df1abd5
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/restaurants ... => CorrelationId:b828417ce68c411ca7cb17a46df1abd5 => AddisEats.Api.Controllers.RestaurantsController.GetAll (ADdisEAts.Api)
+      Audit [END]: Restaurants.GetAll | GET /api/v1/restaurants | Status: 200 | CorrelationId: b828417ce68c411ca7cb17a46df1abd5
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => SpanId:0112fd57f57bda5a, TraceId:7bf85687a1265648907ef2c1d4e74e2e, ParentId:0000000000000000 => ConnectionId:0HNQC976S3ELS => RequestPath:/api/v1/restaurants RequestId:0HNQC976S3ELS:00000001
+      Request: GET /api/v1/restaurants | Status: 200 | Duration: 124ms
+
+warn: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => SpanId:81b9f2b4df567724, TraceId:39e760230f0db667c8f5455e4751c9fb, ParentId:0000000000000000 => ConnectionId:0HNQC976S3ELT => RequestPath:/api/v1/health/slow RequestId:0HNQC976S3ELT:00000001
+      Slow request: GET /api/v1/health/slow | Status: 200 | Duration: 1164ms
+
+info: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/health/error ... => CorrelationId:reordered-err-003 => AddisEats.Api.Controllers.HealthController.DeliberateError (ADdisEAts.Api)
+      Audit [START]: Health.DeliberateError | GET /api/v1/health/error | Params: [none] | CorrelationId: reordered-err-003
+warn: AddisEats.Api.Filters.AuditActionFilter[0]
+      => ... => RequestPath:/api/v1/health/error ... => CorrelationId:reordered-err-003 => AddisEats.Api.Controllers.HealthController.DeliberateError (ADdisEAts.Api)
+      Audit [EXCEPTION]: Health.DeliberateError | GET /api/v1/health/error | Exception: InvalidOperationException | CorrelationId: reordered-err-003
+info: AddisEats.Api.Middleware.RequestTimingMiddleware[0]
+      => SpanId:f0995fdea802c689, TraceId:7eabe5195b6214d3c0a4ca46658bec38, ParentId:0000000000000000 => ConnectionId:0HNQC976S3ELU => RequestPath:/api/v1/health/error RequestId:0HNQC976S3ELU:00000001
+      Request: GET /api/v1/health/error | Status: 200 | Duration: 16ms
+fail: AddisEats.Api.Middleware.ExceptionMiddleware[0]
+      => SpanId:f0995fdea802c689, TraceId:7eabe5195b6214d3c0a4ca46658bec38, ParentId:0000000000000000 => ConnectionId:0HNQC976S3ELU => RequestPath:/api/v1/health/error RequestId:0HNQC976S3ELU:00000001
+      Unhandled exception occurred. TraceId: 00-7eabe5195b6214d3c0a4ca46658bec38-f0995fdea802c689-00
+
+warn: AddisEats.Api.Middleware.ApiKeyMiddleware[0]
+      => SpanId:0afc02b26d321b40, TraceId:01c9fe4439ab55c836301a9d9aae1522, ParentId:0000000000000000 => ConnectionId:0HNQC976S3ELV => RequestPath:/api/v1/partner RequestId:0HNQC976S3ELV:00000001
+      ApiKeyMiddleware short-circuited GET /api/v1/partner with 401 (invalid or missing X-API-Key).
+info: AddisEats.Api.Middleware.ApiKeyMiddleware[0]
+      => SpanId:b8f16082b1e5808b, TraceId:5489492a84f8b0206d27270450656666, ParentId:0000000000000000 => ConnectionId:0HNQC976S3EM0 => RequestPath:/api/v1/partner RequestId:0HNQC976S3EM0:00000001
+      ApiKeyMiddleware verified X-API-Key for GET /api/v1/partner; forwarding to branch handler.
+```
+
+#### Observed Ordering Bugs in the Reordered Pipeline
+1. **Partner `Map` branch skipped correlation and timing completely:** Because `app.Map("/api/v1/partner", ...)` ran before `CorrelationIdMiddleware` and `RequestTimingMiddleware`, `X-Correlation-ID` was `None` on both `401` and `200` responses, `correlationId` in the JSON body was `null`, `ApiKeyMiddleware` logs lost the `CorrelationId` scope, and `RequestTimingMiddleware` never logged `/api/v1/partner` requests at all.
+2. **`RequestTimingMiddleware` falsely logged `Status: 200` on an unhandled `500` error:** Because `RequestTimingMiddleware` ran inside `ExceptionMiddleware`, its `finally` block executed while the exception unwound *before* `ExceptionMiddleware`'s `catch` block set `StatusCode = 500`.
+3. **Timing and exception logs lost the `CorrelationId` scope:** Because `ExceptionMiddleware` and `RequestTimingMiddleware` ran before `CorrelationIdMiddleware`, neither middleware's logs carried `=> CorrelationId:...`.
+
+---
+
+### Week 12 Capstone Checklist
+- [x] `CorrelationIdMiddleware` accepts or generates `X-Correlation-ID`, returns it on every response, and opens a log scope.
+- [x] `RequestTimingMiddleware` logs status and duration with a `1000ms` `Warning` threshold.
+- [x] `ApiKeyMiddleware` demonstrates short-circuiting (`401`) on an `app.Map("/api/v1/partner", ...)` branch.
+- [x] `AuditActionFilter` logs controller action execution start, outcome/status, and exceptions.
+- [x] Zero scoped services injected into any middleware constructor.
+- [x] Pipeline arranged in canonical order with `UseRateLimiter`, `UseAuthentication`, and `UseAuthorization` positioned and commented.
+- [x] Canonical and deliberately reordered pipeline log outputs recorded in `README.md`.

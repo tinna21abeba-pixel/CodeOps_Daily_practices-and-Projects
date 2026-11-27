@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Reflection;
+using System.IO;
+using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,7 @@ builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOpt
 builder.Services.AddControllers(options =>
     {
         options.Filters.Add<RejectUnknownQueryParamsFilter>();
+        options.Filters.Add<AuditActionFilter>();
     })
     .ConfigureApiBehaviorOptions(options =>
     {
@@ -69,9 +74,25 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options=>{
+    options.SwaggerDoc("v1",new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "AddisEats API",
+        Description = "AddisEats API",
+        TermsOfService = new Uri("https://addiseats.et/terms"),
+       
+    });
+var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
+
+app.UseMiddleware<CorrelationIdMiddleware>();
+
+app.UseMiddleware<RequestTimingMiddleware>();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
@@ -81,11 +102,29 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseCors("frontend");
+// app.UseRateLimiter();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
-app.UseAuthorization();
+app.Map("/api/v1/partner", partnerApp =>
+{
+    partnerApp.UseMiddleware<ApiKeyMiddleware>();
+    partnerApp.Run(async context =>
+    {
+        await context.Response.WriteAsJsonAsync(new
+        {
+            service = "AddisEats Partner Branch",
+            status = "Authorized",
+            correlationId = context.Items[CorrelationIdMiddleware.ItemKey],
+            timestamp = DateTime.UtcNow
+        });
+    });
+});
+
 
 app.MapControllers();
 
