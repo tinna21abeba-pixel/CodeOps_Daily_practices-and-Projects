@@ -5,6 +5,7 @@ using AddisEats.Api.Models;
 using AddisEats.Api.Services;
 
 [ApiController]
+[Tags("Restaurants")]
 [Route("api/v1/[controller]")]
 public class RestaurantsController : ControllerBase
 {
@@ -16,6 +17,8 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<RestaurantDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public IActionResult Search([FromQuery] RestaurantQuery query)
     {
         var restaurants = _restaurantService.Search(query);
@@ -24,6 +27,8 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [ProducesResponseType(typeof(RestaurantDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<RestaurantDto> GetOne(int id)
     {
         var restaurant = _restaurantService.GetById(id);
@@ -42,6 +47,8 @@ public class RestaurantsController : ControllerBase
     }
 
     [HttpGet("{id:int}/menu")]
+    [ProducesResponseType(typeof(List<MenuItem>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public IActionResult GetMenu(int id)
     {
         var restaurant = _restaurantService.GetById(id);

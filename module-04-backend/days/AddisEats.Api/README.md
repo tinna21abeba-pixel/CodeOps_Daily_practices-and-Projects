@@ -1029,3 +1029,51 @@ git commit -m "feat: add AuditActionFilter logging action name and bound argumen
 git add AddisEats.Api/README.md
 git commit -m "docs: record middleware experiments and line-by-line Program.cs pipeline in README"
 ```
+
+---
+
+# Addis Eats API - Day 60 Exercises
+
+## Exercise 1 - Structured Message Templates in Services
+
+Added `ILogger<T>` to `OrderService`, `RestaurantService`, `TeleBirrProvider`, and `CbeBirrProvider` using structured message templates with named placeholders (`{OrderId}`, `{RestaurantId}`, `{ItemCount}`, `{TotalAmount}`, `{PreviousStatus}`, `{NewStatus}`, `{Amount}`, `{ProviderName}`, `{ResultCount}`), with zero `$` string interpolation or `+` string concatenation in any log call.
+
+---
+
+## Exercise 2 - Log Level Configuration & Request Volume Difference
+
+Configured `Logging:LogLevel` in `appsettings.json`:
+- `"AddisEats.Api": "Debug"`
+- `"Microsoft": "Warning"`
+- `"Microsoft.EntityFrameworkCore": "Warning"`
+
+### Observed Volume Difference for One Request (`POST /api/v1/orders`)
+- **All categories at `Debug` (`Microsoft*` at `Debug`)**: **94 log lines (8,450 bytes)** — flooded with Kestrel connection, DFA routing, MVC filter pipeline, model-binding, and output-formatter diagnostics.
+- **Original baseline (`Default: Information`, `Microsoft.AspNetCore: Warning`)**: **6 log lines (649 bytes)** — suppresses framework noise, but also hides `AddisEats.Api` `Debug` diagnostics (`OrderService`, `RestaurantService`, `DemoBearerAuthenticationHandler`).
+- **Configured (`AddisEats.Api: Debug`, `Microsoft: Warning`, `Microsoft.EntityFrameworkCore: Warning`)**: Retains all `AddisEats.Api` `Debug` + `Information` + `Warning` logs while suppressing all `Microsoft.*` `Debug`/`Information` framework noise (~87% fewer lines than global `Debug`).
+
+---
+
+## Exercise 3 - Correlation ID in `OrderService` Logs
+
+Enabled `"Console": { "IncludeScopes": true }` in `appsettings.json` so the logging scope created by Day 59's `CorrelationIdMiddleware` is rendered on console log entries emitted inside `OrderService`.
+
+### One-Line Explanation
+`CorrelationIdMiddleware` wraps `_next(context)` in an `ILogger.BeginScope` containing `CorrelationId` stored in `AsyncLocal` state, so the logger automatically attaches that scope to every log line written downstream inside `OrderService` without passing `HttpContext` into the service.
+
+---
+
+## Exercise 4 - Log Output Audit: Personal Data & Impersonation Credentials
+
+### Findings in Observed Log Output
+Reviewing the captured log output for API requests revealed sensitive fields serialized by `AuditActionFilter` (`context.ActionArguments`):
+
+1. **`CustomerName` (`"Abebe Kebede"`)** — Identifies a person directly.
+2. **`CustomerPhone` (`"+251911234567"`)** — Identifies a person directly via Ethiopian mobile number.
+3. **`DeliveryAddress` (`"Cameroon St, Bole"`)** — Identifies a person's home/delivery location.
+4. **`SpecialInstructions`** — Free-text order notes that can contain gate codes, apartment numbers, or contact numbers.
+5. **`authorization` parameter on `GET /api/v1/orders/admin` (`[FromHeader(Name = "Authorization")]`)** — Logs the raw Bearer token (`Bearer AdminToken` / `Bearer CourierToken123`), which could be replayed by anyone with log access to act as that caller.
+
+### Fixes Applied
+- Updated `Filters/AuditActionFilter.cs` to sanitize `ActionArguments` recursively via `SanitizeArguments` / `SanitizeNode`, replacing sensitive keys (`authorization`, `token`, `apiKey`, `password`, `secret`, `customerName`, `customerPhone`, `deliveryAddress`, `specialInstructions`, `ownerPhone`, `phone`, `address`) and any `Bearer ...` string values with `"[REDACTED]"` before logging.
+- Kept all `OrderService`, `RestaurantService`, and payment provider log templates restricted to non-PII operational identifiers (`OrderId`, `RestaurantId`, `ItemCount`, `TotalAmount`, `Status`, `MenuItemId`, `ResultCount`).

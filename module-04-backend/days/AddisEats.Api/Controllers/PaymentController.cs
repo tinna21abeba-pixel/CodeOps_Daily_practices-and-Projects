@@ -1,9 +1,11 @@
 namespace AddisEats.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using AddisEats.Api.Models;
 using AddisEats.Api.Services;
 
 [ApiController]
+[Tags("Payments")]
 [Route("api/v1/payment")]
 public class PaymentController : ControllerBase
 {
@@ -15,6 +17,9 @@ public class PaymentController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(PaymentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status402PaymentRequired)]
     public IActionResult ProcessPayment([FromQuery] decimal amount)
     {
         if (amount <= 0 || amount > 50000m)
@@ -28,10 +33,8 @@ public class PaymentController : ControllerBase
             });
         }
 
-        return Ok(new
-        {
-            Provider = _paymentProvider.ProviderName,
-            Result = _paymentProvider.ProcessPayment(amount)
-        });
+        return Ok(new PaymentResponse(
+            _paymentProvider.ProviderName,
+            _paymentProvider.ProcessPayment(amount)));
     }
 }

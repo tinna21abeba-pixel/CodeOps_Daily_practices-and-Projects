@@ -3,9 +3,11 @@ namespace AddisEats.Api.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AddisEats.Api.Middleware;
+using AddisEats.Api.Models;
 using AddisEats.Api.Services;
 
 [ApiController]
+[Tags("Health")]
 [Route("api/v1/health")]
 public class HealthController : ControllerBase
 {
@@ -21,22 +23,22 @@ public class HealthController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(HealthCheckResponse), StatusCodes.Status200OK)]
     public IActionResult GetHealth()
     {
-        return Ok(new
-        {
-            FirstInstance = _clock1.UtcNow,
-            SecondInstance = _clock2.UtcNow
-        });
+        return Ok(new HealthCheckResponse(_clock1.UtcNow, _clock2.UtcNow));
     }
 
     [HttpGet("error")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
     public IActionResult DeliberateError()
     {
         throw new InvalidOperationException("Deliberate unhandled exception for middleware verification.");
     }
 
     [HttpGet("concurrency")]
+    [ProducesResponseType(typeof(ConcurrencyCheckResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConcurrencyCheck(
         [FromServices] IScopedRequestTracker scopedTracker,
         [FromQuery] string? tag = null,
@@ -50,24 +52,23 @@ public class HealthController : ControllerBase
             await Task.Delay(delayMs);
         }
 
-        return Ok(new
-        {
-            MiddlewareInstanceId = middlewareTracker.InstanceId,
-            ControllerInstanceId = scopedTracker.InstanceId,
-            RequestedTag = tag,
-            TagOnEntry = tagOnEntry,
-            TagAfterDelay = middlewareTracker.Tag
-        });
+        return Ok(new ConcurrencyCheckResponse(
+            middlewareTracker.InstanceId,
+            scopedTracker.InstanceId,
+            tag,
+            tagOnEntry,
+            middlewareTracker.Tag));
     }
 
     [Authorize]
     [HttpGet("protected")]
+    [ProducesResponseType(typeof(ProtectedHealthResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IActionResult GetProtected()
     {
-        return Ok(new
-        {
-            User = User.Identity?.Name,
-            Authenticated = User.Identity?.IsAuthenticated ?? false
-        });
+        return Ok(new ProtectedHealthResponse(
+            User.Identity?.Name,
+            User.Identity?.IsAuthenticated ?? false));
     }
 }

@@ -4,6 +4,8 @@ using AddisEats.Api.Middleware;
 using AddisEats.Api.Models;
 using AddisEats.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -57,7 +59,19 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Addis Eats API",
+        Version = "v1",
+        Description = "REST API for Addis Eats restaurant discovery, menu browsing, server-priced order placement, delivery configuration, and Ethiopian mobile payments."
+    });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    options.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
