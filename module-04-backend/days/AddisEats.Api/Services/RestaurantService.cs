@@ -1,19 +1,40 @@
 using AddisEats.Api.Data;
 using AddisEats.Api.Models;
+using Microsoft.Extensions.Logging;
 
 namespace AddisEats.Api.Services;
 
 public class RestaurantService : IRestaurantService
 {
     private readonly List<Restaurant> _restaurants = SeedData.Restaurants;
+    private readonly ILogger<RestaurantService> _logger;
+
+    public RestaurantService(ILogger<RestaurantService> logger)
+    {
+        _logger = logger;
+    }
 
     public Restaurant? GetById(int id)
     {
-        return _restaurants.FirstOrDefault(r => r.Id == id);
+        _logger.LogDebug("Looking up restaurant {RestaurantId}", id);
+        var restaurant = _restaurants.FirstOrDefault(r => r.Id == id);
+        if (restaurant == null)
+        {
+            _logger.LogWarning("Restaurant {RestaurantId} was not found", id);
+        }
+
+        return restaurant;
     }
 
     public IEnumerable<Restaurant> Search(RestaurantQuery query)
     {
+        _logger.LogDebug(
+            "Searching restaurants with Area {Area}, MaxFeeEtb {MaxFeeEtb}, Page {Page}, Limit {Limit}",
+            query.Area,
+            query.MaxFeeEtb,
+            query.Page,
+            query.Limit);
+
         var result = _restaurants.AsEnumerable();
 
         if (!string.IsNullOrWhiteSpace(query.Name))
@@ -38,11 +59,14 @@ public class RestaurantService : IRestaurantService
         int page = query.Page < 1 ? 1 : query.Page;
         int limit = query.Limit;
 
-        return result
+        var matches = result
             .OrderBy(r => r.Id)
             .Skip((page - 1) * limit)
             .Take(limit)
             .ToList();
+
+        _logger.LogDebug("Restaurant search returned {ResultCount} matches", matches.Count);
+        return matches;
     }
 
     public IEnumerable<Restaurant> Search(string? area = null, int page = 1, int limit = 10)

@@ -3,6 +3,7 @@ namespace AddisEats.Api.Services;
 using AddisEats.Api.Common;
 using AddisEats.Api.Data;
 using AddisEats.Api.Models;
+using Microsoft.Extensions.Logging;
 
 public class OrderService : IOrderService
 {
@@ -47,37 +48,55 @@ public class OrderService : IOrderService
     };
 
     private readonly IRestaurantService _restaurantService;
+    private readonly ILogger<OrderService> _logger;
 
-    public OrderService(IRestaurantService restaurantService)
+    public OrderService(IRestaurantService restaurantService, ILogger<OrderService> logger)
     {
         _restaurantService = restaurantService;
+        _logger = logger;
     }
 
     public Order? GetById(int id)
     {
-        return _orders.FirstOrDefault(o => o.Id == id);
+        _logger.LogDebug("Fetching order {OrderId}", id);
+        var order = _orders.FirstOrDefault(o => o.Id == id);
+        if (order == null)
+        {
+            _logger.LogWarning("Order {OrderId} was not found", id);
+        }
+
+        return order;
     }
 
     public IEnumerable<Order> GetAll()
     {
+        _logger.LogDebug("Fetching all orders; current count is {OrderCount}", _orders.Count);
         return _orders;
     }
 
     public Result<Order> Place(CreateOrderRequest request)
     {
+        _logger.LogDebug(
+            "Placing order for restaurant {RestaurantId} with {ItemCount} line items",
+            request.RestaurantId,
+            request.Items?.Count ?? 0);
+
         var restaurant = _restaurantService.GetById(request.RestaurantId);
         if (restaurant == null)
         {
+            _logger.LogWarning("Order placement failed: restaurant {RestaurantId} not found", request.RestaurantId);
             return Result<Order>.Failure(Error.RestaurantNotFound(request.RestaurantId));
         }
 
         if (restaurant.Menu == null || restaurant.Menu.Count == 0)
         {
+            _logger.LogWarning("Order placement failed: restaurant {RestaurantId} ({RestaurantName}) is closed", restaurant.Id, restaurant.Name);
             return Result<Order>.Failure(Error.RestaurantClosed(restaurant.Name));
         }
 
         if (request.Items == null || request.Items.Count == 0)
         {
+            _logger.LogWarning("Order placement failed: order for restaurant {RestaurantId} contained no items", request.RestaurantId);
             return Result<Order>.Failure(Error.AmountInvalid("Order must contain at least one item."));
         }
 
@@ -89,11 +108,13 @@ public class OrderService : IOrderService
             var menuItem = restaurant.Menu.FirstOrDefault(m => m.Id == itemReq.MenuItemId);
             if (menuItem == null)
             {
+                _logger.LogWarning("Order placement failed: menu item {MenuItemId} does not belong to restaurant {RestaurantId}", itemReq.MenuItemId, restaurant.Id);
                 return Result<Order>.Failure(Error.AmountInvalid($"Menu item with ID {itemReq.MenuItemId} does not belong to restaurant '{restaurant.Name}'."));
             }
 
             if (itemReq.Quantity <= 0)
             {
+                _logger.LogWarning("Order placement failed: invalid quantity {Quantity} for menu item {MenuItemId}", itemReq.Quantity, itemReq.MenuItemId);
                 return Result<Order>.Failure(Error.AmountInvalid("Item quantity must be greater than zero."));
             }
 
@@ -109,6 +130,7 @@ public class OrderService : IOrderService
 
         if (itemsTotal <= 0m)
         {
+            _logger.LogWarning("Order placement failed: calculated food total {ItemsTotal} ETB is not positive", itemsTotal);
             return Result<Order>.Failure(Error.AmountInvalid("Calculated food total must be greater than zero ETB."));
         }
 
@@ -135,6 +157,12 @@ public class OrderService : IOrderService
         };
 
         _orders.Add(order);
+        _logger.LogInformation(
+            "Order {OrderId} placed for restaurant {RestaurantId} with {ItemCount} items totaling {TotalAmount} ETB",
+            order.Id,
+            order.RestaurantId,
+            order.Items.Count,
+            order.TotalAmount);
         return Result<Order>.Success(order);
     }
 
@@ -143,15 +171,23 @@ public class OrderService : IOrderService
         var order = _orders.FirstOrDefault(o => o.Id == id);
         if (order == null)
         {
+            _logger.LogWarning("Cannot update status: order {OrderId} was not found", id);
             return Result<Order>.Failure(Error.OrderNotFound(id));
         }
 
         if (order.Status == OrderStatus.Delivered && status == OrderStatus.Cancelled)
         {
+            _logger.LogWarning("Cannot cancel order {OrderId}: already delivered", id);
             return Result<Order>.Failure(Error.OrderAlreadyDelivered(id));
         }
 
+        var previousStatus = order.Status;
         order.Status = status;
+        _logger.LogInformation(
+            "Order {OrderId} status updated from {PreviousStatus} to {NewStatus}",
+            order.Id,
+            previousStatus,
+            order.Status);
         return Result<Order>.Success(order);
     }
 }
