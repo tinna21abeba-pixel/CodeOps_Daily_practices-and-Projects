@@ -35,6 +35,7 @@ public class MenuController : ControllerBase
     /// <response code="200">Returns the matching page of menu items.</response>
     /// <response code="400">An invalid query value or unrecognized query parameter was supplied.</response>
     [HttpGet]
+    
     [ProducesResponseType(typeof(PagedResponse<MenuItem>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public ActionResult<PagedResponse<MenuItem>> GetAll(
@@ -60,6 +61,7 @@ public class MenuController : ControllerBase
     /// <response code="200">Menu item found and returned.</response>
     /// <response code="404">No menu item exists with the specified ID.</response>
     [HttpGet("{id:int}")]
+   
     [ProducesResponseType(typeof(MenuItem), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<MenuItem> GetById(int id)
