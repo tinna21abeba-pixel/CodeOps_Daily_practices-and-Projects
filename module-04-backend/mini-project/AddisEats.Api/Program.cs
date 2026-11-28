@@ -12,6 +12,9 @@ using System.Text.Json.Serialization;
 using System.Reflection;
 using System.IO;
 using Microsoft.OpenApi.Models;
+using AddisEats.Api.Services.Auth;
+using Microsoft.AspNetCore.Identity;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,6 +53,8 @@ builder.Services.AddControllers(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.AddSingleton<IAuthService, AuthService>();
+builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IMenuService, MenuService>();
@@ -57,6 +62,7 @@ builder.Services.AddScoped<IMenuItemService, MenuService>();
 builder.Services.AddScoped<IResturantService, ResturantService>();
 builder.Services.AddScoped<IRestuarantService, ResturantService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+
 
 builder.Services.AddCors(options =>
 {
