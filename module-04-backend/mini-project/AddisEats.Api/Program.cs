@@ -1,3 +1,7 @@
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using AddisEats.Api.Filters;
 using AddisEats.Api.MenuItemServices;
 using AddisEats.Api.Middleware;
@@ -17,7 +21,7 @@ using Microsoft.AspNetCore.Identity;
 
 
 
-var builder = WebApplication.CreateBuilder(args);
+var builder= WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<MenuOptions>(builder.Configuration.GetSection(MenuOptions.SectionName));
 
@@ -102,6 +106,38 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 });
 
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT key is missing.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtKey)),
+
+            ClockSkew = TimeSpan.FromSeconds(30),
+
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
@@ -120,9 +156,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("frontend");
-// app.UseRateLimiter();
-// app.UseAuthentication();
-// app.UseAuthorization();
+//app.UseRateLimiter();
+ app.UseAuthentication();
+ app.UseAuthorization();
 
 app.Map("/api/v1/partner", partnerApp =>
 {
