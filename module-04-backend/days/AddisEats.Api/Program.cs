@@ -1,11 +1,14 @@
-using AddisEats.Api.Auth;
 using AddisEats.Api.Filters;
 using AddisEats.Api.Middleware;
 using AddisEats.Api.Models;
 using AddisEats.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -43,9 +46,37 @@ builder.Services.AddScoped<IPaymentProvider, CbeBirrProvider>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IScopedRequestTracker, ScopedRequestTracker>();
+builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddSingleton<IUserStore, InMemoryUserStore>();
+builder.Services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-builder.Services.AddAuthentication("DemoBearer")
-    .AddScheme<Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions, DemoBearerAuthenticationHandler>("DemoBearer", null);
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT signing key (Jwt:Key) is missing.");
+var jwtIssuer = builder.Configuration["Jwt:Issuer"]
+    ?? throw new InvalidOperationException("JWT issuer (Jwt:Issuer) is missing.");
+var jwtAudience = builder.Configuration["Jwt:Audience"]
+    ?? throw new InvalidOperationException("JWT audience (Jwt:Audience) is missing.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromSeconds(30),
+            NameClaimType = "name",
+            RoleClaimType = "role"
+        };
+    });
 builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
@@ -71,6 +102,31 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
     options.IncludeXmlComments(xmlPath);
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter your JWT access token."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 var app = builder.Build();

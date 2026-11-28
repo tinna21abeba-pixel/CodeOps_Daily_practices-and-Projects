@@ -10,6 +10,8 @@ public class AuditActionFilter : IActionFilter
     {
         "authorization",
         "token",
+        "accesstoken",
+        "refreshtoken",
         "apikey",
         "api_key",
         "x-api-key",
@@ -17,6 +19,7 @@ public class AuditActionFilter : IActionFilter
         "secret",
         "customername",
         "customerphone",
+        "mobilenumber",
         "deliveryaddress",
         "specialinstructions",
         "ownerphone",

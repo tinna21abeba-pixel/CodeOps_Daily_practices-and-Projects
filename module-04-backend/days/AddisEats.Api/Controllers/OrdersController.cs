@@ -1,10 +1,12 @@
 namespace AddisEats.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AddisEats.Api.Models;
 using AddisEats.Api.Services;
 
 [ApiController]
+[Authorize]
 [Tags("Orders")]
 [Route("api/v1/[controller]")]
 public class OrdersController : ControllerBase
@@ -21,8 +23,10 @@ public class OrdersController : ControllerBase
     /// </summary>
     /// <returns>The full collection of orders.</returns>
     /// <response code="200">Returns the list of orders.</response>
+    /// <response code="401">Authentication required.</response>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Order>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     public IActionResult GetAll()
     {
         return Ok(_orderService.GetAll());
@@ -34,9 +38,11 @@ public class OrdersController : ControllerBase
     /// <param name="id">Unique order identifier.</param>
     /// <returns>The matching order details.</returns>
     /// <response code="200">Order found and returned.</response>
+    /// <response code="401">Authentication required.</response>
     /// <response code="404">No order exists with the specified ID.</response>
     [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public ActionResult<Order> GetById(int id)
     {
@@ -62,12 +68,14 @@ public class OrdersController : ControllerBase
     /// <returns>The newly created order with Location header.</returns>
     /// <response code="201">Order placed successfully.</response>
     /// <response code="400">One or more fields failed validation.</response>
+    /// <response code="401">Authentication required.</response>
     /// <response code="404">The target restaurant does not exist.</response>
     /// <response code="409">The target restaurant is currently closed.</response>
     /// <response code="422">An ordered menu item is invalid or the total ETB amount is non-positive.</response>
     [HttpPost]
     [ProducesResponseType(typeof(Order), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -99,11 +107,13 @@ public class OrdersController : ControllerBase
     /// <returns>The updated order.</returns>
     /// <response code="200">Order status updated successfully.</response>
     /// <response code="400">The status payload failed validation.</response>
+    /// <response code="401">Authentication required.</response>
     /// <response code="404">No order exists with the specified ID.</response>
     /// <response code="409">The order has already been delivered and cannot be cancelled.</response>
     [HttpPatch("{id:int}/status")]
     [ProducesResponseType(typeof(Order), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
     public IActionResult UpdateStatus(int id, [FromBody] UpdateOrderStatusRequest request)
@@ -128,39 +138,17 @@ public class OrdersController : ControllerBase
     /// <summary>
     /// Retrieves all orders for administrative review.
     /// </summary>
-    /// <param name="authorization">Bearer authorization header containing an admin token.</param>
     /// <returns>All orders when authorized as an administrator.</returns>
     /// <response code="200">Admin authorization succeeded; returns all orders.</response>
-    /// <response code="401">Missing Authorization header.</response>
-    /// <response code="403">Provided token lacks administrator permissions.</response>
+    /// <response code="401">Missing or invalid JWT bearer token.</response>
+    /// <response code="403">Authenticated user lacks administrator role.</response>
     [HttpGet("admin")]
+    [Authorize(Roles = UserRoles.Admin)]
     [ProducesResponseType(typeof(IEnumerable<Order>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-    public IActionResult GetAdminOrders([FromHeader(Name = "Authorization")] string? authorization)
+    public IActionResult GetAdminOrders()
     {
-        if (string.IsNullOrWhiteSpace(authorization))
-        {
-            return StatusCode(StatusCodes.Status401Unauthorized, new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/unauthorized",
-                Title = "UNAUTHORIZED",
-                Status = StatusCodes.Status401Unauthorized,
-                Detail = "You must be signed in to perform this request."
-            });
-        }
-
-        if (!authorization.Contains("AdminToken", StringComparison.OrdinalIgnoreCase))
-        {
-            return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
-            {
-                Type = "https://addiseats.et/errors/forbidden",
-                Title = "PERMISSION_DENIED",
-                Status = StatusCodes.Status403Forbidden,
-                Detail = "You do not have permission to perform this action."
-            });
-        }
-
         return Ok(_orderService.GetAll());
     }
 }

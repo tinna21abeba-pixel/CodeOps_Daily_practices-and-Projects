@@ -1,9 +1,38 @@
 using AddisEats.Api.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace AddisEats.Api.Data;
 
 public static class SeedData
 {
+    public static List<User> CreateSeedUsers(IPasswordHasher<User> passwordHasher)
+    {
+        var seededAt = new DateTime(2026, 11, 28, 0, 0, 0, DateTimeKind.Utc);
+        var entries = new (int Id, string Name, string Mobile, string Role, string PlainPassword)[]
+        {
+            (1, "Abebe Kebede", "+251911111111", UserRoles.Customer, "CustomerPass123!"),
+            (2, "Bole Doro & Kitfo", "+251922222222", UserRoles.Restaurant, "RestaurantPass123!"),
+            (3, "Dawit Tadesse", "+251933333333", UserRoles.Courier, "CourierPass123!")
+        };
+
+        var users = new List<User>(entries.Length);
+        foreach (var entry in entries)
+        {
+            var user = new User
+            {
+                Id = entry.Id,
+                Name = entry.Name,
+                MobileNumber = entry.Mobile,
+                Role = entry.Role,
+                CreatedAtUtc = seededAt
+            };
+            user.PasswordHash = passwordHasher.HashPassword(user, entry.PlainPassword);
+            users.Add(user);
+        }
+
+        return users;
+    }
+
     public static readonly List<Restaurant> Restaurants = new()
     {
         new Restaurant

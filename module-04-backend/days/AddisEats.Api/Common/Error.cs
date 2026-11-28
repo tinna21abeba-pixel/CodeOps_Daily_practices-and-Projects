@@ -33,4 +33,25 @@ public record Error(string Code, string Message, int StatusCode = 400)
 
     public static Error AmountInvalid(string detail) =>
         new("AMOUNT_INVALID", detail, 422);
+
+    public static Error MobileAlreadyRegistered(string detail = "An account with this Ethiopian mobile number already exists.") =>
+        new("MOBILE_ALREADY_REGISTERED", detail, 409);
+
+    public static Error InvalidRole(string detail = "Role must be Customer, Restaurant, or Courier.") =>
+        new("INVALID_ROLE", detail, 400);
+
+    public static Error InvalidCredentials(string detail = "Invalid mobile number or password.") =>
+        new("INVALID_CREDENTIALS", detail, 401);
+
+    public static Error InvalidRefreshToken(string detail = "The provided refresh token is invalid.") =>
+        new("INVALID_REFRESH_TOKEN", detail, 401);
+
+    public static Error RefreshTokenRevoked(string detail = "This refresh token has been revoked.") =>
+        new("REFRESH_TOKEN_REVOKED", detail, 401);
+
+    public static Error RefreshTokenReuseDetected(string detail = "Refresh token reuse detected. All active sessions have been revoked for security.") =>
+        new("REFRESH_TOKEN_REUSE_DETECTED", detail, 401);
+
+    public static Error RefreshTokenExpired(string detail = "This refresh token has expired. Please sign in again.") =>
+        new("REFRESH_TOKEN_EXPIRED", detail, 401);
 }
