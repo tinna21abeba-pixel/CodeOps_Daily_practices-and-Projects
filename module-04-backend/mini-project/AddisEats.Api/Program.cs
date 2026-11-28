@@ -53,7 +53,8 @@ builder.Services.AddControllers(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-builder.Services.AddSingleton<IAuthService, AuthService>();
+
+builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
 builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
